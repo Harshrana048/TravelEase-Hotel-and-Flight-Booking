@@ -1,4 +1,5 @@
 
+
 // Local module
 const User = require('../models/User.model');
 
@@ -23,13 +24,14 @@ exports.register = async (req, res) => {
                 message: 'User with this email already exists',
             });
         }
-
+        
         // 4. Create the user
         const newUser = await User.create({
             name,
             email,
             password,
             phone,
+            
         });
 
         // 5. Respond (never send password back)
@@ -46,3 +48,29 @@ exports.register = async (req, res) => {
         });
     }
 };
+
+exports.getlogin = async(req,res,next) => {
+    try {
+        const {email,password} = req.body;
+        if(!email || !password){
+            return res.status(400).json({message: 'Email and password required'});
+        }
+
+        const user = await User.findOne({email});
+        if(!user || !(await user.comparePassword(password) )){
+            return res.status(400).json({message: 'Invalid email or password'});
+        }
+        return res.status(200).json({
+            success: true,
+            message: 'Login successful'
+        });
+
+        
+        
+    } catch (err) {
+        res.status(500).json({ message: err.message });    
+    }
+
+
+
+}
