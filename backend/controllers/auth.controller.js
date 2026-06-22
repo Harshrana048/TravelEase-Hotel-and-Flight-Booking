@@ -1,8 +1,14 @@
 
-
+// External module
+const jwt = require('jsonwebtoken');
 // Local module
 const User = require('../models/User.model');
 
+const signToken = (id) => {
+ return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+}
 
 exports.register = async (req, res) => {
     try {
@@ -26,19 +32,17 @@ exports.register = async (req, res) => {
         }
         
         // 4. Create the user
-        const newUser = await User.create({
+        const user = await User.create({
             name,
             email,
             password,
             phone,
             
         });
+        const token = signToken(user._id);
 
         // 5. Respond (never send password back)
-        return res.status(201).json({
-            success: true,
-            message: 'User registered successfully',
-        });
+         res.status(201).json({ token, user: { id: user._id, name, email, role: user.role } });
 
     } catch (error) {
         console.error('Register error:', error.message);
@@ -60,17 +64,31 @@ exports.getlogin = async(req,res,next) => {
         if(!user || !(await user.comparePassword(password) )){
             return res.status(400).json({message: 'Invalid email or password'});
         }
-        return res.status(200).json({
-            success: true,
-            message: 'Login successful'
-        });
+        const token = signToken(user._id);
+         res.json({ token, user: { id: user._id, name: user.name, email, role: user.role } });
 
         
         
     } catch (err) {
         res.status(500).json({ message: err.message });    
     }
-
-
-
 }
+
+exports.getProfile = async (req, res) => {
+  res.json(req.user);
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id, { name, phone },  {
+    returnDocument: 'after'
+  }
+    ).select('-password');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
