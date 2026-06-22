@@ -6,12 +6,14 @@ require('dotenv').config();
 // Local Module
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth.routes');
+const hotelRoutes = require('./routes/hotel.routes')
 
 const app = express();
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/hotels',hotelRoutes);
 
 // connect Db and Start Server
 connectDB().then(() => {
