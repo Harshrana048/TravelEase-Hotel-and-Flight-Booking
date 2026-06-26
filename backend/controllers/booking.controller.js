@@ -179,42 +179,36 @@ exports.getMyBookings = async (req, res) => {
     }
 }
 
-exports.cancelBookings = async(req,res) => {
-    try{
-    const {id} = req.params;
-    const {type} = req.query;
+exports.cancelBookings = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { type } = req.query;
 
-    if(!type || !['hotel','flight'].includes(type)){
-        return res.status(400).json({ message: 'Query param "type" must be "hotel" or "flight"' });
+        if (!type || !['hotel', 'flight'].includes(type)) {
+            return res.status(400).json({ message: 'Query param "type" must be "hotel" or "flight"' });
+        }
+
+        const Model = type === 'hotel' ? HotelBooking : FlightBooking;
+
+        const booking = await Model.findOne({ _id: id, userId: req.user._id });
+        if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+        if (booking.bookingStatus === 'cancelled') {
+            return res.status(400).json({ message: 'Booking is already cancelled' });
+        }
+
+        booking.bookingStatus = 'cancelled';
+
+        if (booking.paymentStatus === 'paid') {
+            booking.paymentStatus = 'refund_pending';
+        }
+        await booking.save();
+
+        // Availability restoration moved to payment.cancelAndRefund to ensure
+        // the refund and availability update happen together and only once.
+        res.json({ message: 'Booking cancelled successfully', booking });
     }
-
-    const Model = type === 'hotel' ? HotelBooking : FlightBooking;
-
-    const booking = await Model.findOne({_id: id , userId: req.user._id});
-    if(!booking ) return res.status(404).json({ message: 'Booking not found' });
-
-    if(booking.bookingStatus === 'cancelled'){
-        return res.status(400).json({ message: 'Booking is already cancelled' });
+    catch (err) {
+        res.status(500).json({ message: err.message });
     }
-
-    booking.bookingStatus = 'cancelled';
-
-    if(booking.paymentStatustatus === 'paid'){
-         booking.paymentStatus = 'refund_pending';
-    }
-    await booking.save();
-
-   if (type === 'hotel') {
-      await Hotel.findByIdAndUpdate(booking.hotelId, { $inc: { roomsAvailable: booking.roomsBooked } });
-    } else {
-      await Flight.findByIdAndUpdate(booking.flightId, { $inc: { availableSeats: booking.passengerCount } });
-      if (booking.returnFlightId) {
-        await Flight.findByIdAndUpdate(booking.returnFlightId, { $inc: { availableSeats: booking.passengerCount } });
-      }
-    }
-    res.json({ message: 'Booking cancelled successfully', booking });
-}
-catch (err) {
-    res.status(500).json({ message: err.message });
-  }
 };

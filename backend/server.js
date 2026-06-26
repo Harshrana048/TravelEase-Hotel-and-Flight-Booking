@@ -9,6 +9,8 @@ const authRoutes = require('./routes/auth.routes');
 const hotelRoutes = require('./routes/hotel.routes');
 const flightRoutes = require('./routes/flight.routes');
 const bookingRoutes = require('./routes/booking.routes');
+const paymentRoutes = require('./routes/payment.routes');
+const { notFound } = require('./middleware/404Notfound');
 
 const app = express();
 app.use(express.json());
@@ -18,6 +20,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/hotels',hotelRoutes);
 app.use('/api/flights',flightRoutes);
 app.use('/api/bookings',bookingRoutes);
+app.use('/api/payments',paymentRoutes);
+
+
+// error
+app.use(notFound);
 
 // connect Db and Start Server
 connectDB().then(() => {
