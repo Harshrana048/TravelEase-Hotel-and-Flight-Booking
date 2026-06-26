@@ -68,6 +68,8 @@ exports.bookHotel = async (req, res) => {
             checkOutDate: checkOut,
             nights,
             totalPrice,
+            bookingStatus: 'pending',      
+            paymentStatus: 'pending',
 
         });
         // Reduce room availability
@@ -139,6 +141,8 @@ exports.bookFlight = async (req, res) => {
             passengerCount,
             seatNumbers,
             totalPrice,
+            bookingStatus: 'pending',      
+            paymentStatus: 'pending',
             tripType: tripType || 'one-way',
             returnFlightId: tripType === 'round-trip' ? returnFlightId : null,
         });
@@ -204,8 +208,7 @@ exports.cancelBookings = async (req, res) => {
         }
         await booking.save();
 
-        // Availability restoration moved to payment.cancelAndRefund to ensure
-        // the refund and availability update happen together and only once.
+        
         res.json({ message: 'Booking cancelled successfully', booking });
     }
     catch (err) {

@@ -6,6 +6,9 @@ const HotelBooking = require('../models/HotelBooking.model');
 const FlightBooking = require('../models/FlightBooking.model');
 const Hotel = require('../models/hotel.model');
 const Flight = require('../models/Flight.model');
+const User = require('../models/User.model');
+const sendEmail = require('../utils/sendEmail');
+const { generateHotelTicketPDF, generateFlightTicketPDF } = require('../utils/generatePDF');
 
 
 
@@ -181,12 +184,92 @@ exports.verifyPayment = async (req, res) => {
         // Update booking status to confirmed
 
         const Model = payment.bookingType === 'HotelBooking' ? HotelBooking : FlightBooking;
-        await Model.findByIdAndUpdate(payment.bookingId, {
-            paymentStatus: 'paid',
-            bookingStatus: 'confirmed',
+        const booking = await Model.findByIdAndUpdate(
+            payment.bookingId,
+            {
+                paymentStatus: 'paid',
+                bookingStatus: 'confirmed',
+            },
+            { new: true }
+        )
+            .populate('hotelId')
+            .populate('flightId')
+            .populate('returnFlightId');
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found after payment update' });
         }
 
-        );
+        // NOW send confirmation email (only after payment confirmed)
+        try {
+            const user = await User.findById(req.user._id);
+
+            if (payment.bookingType === 'HotelBooking') {
+                const pdfBuffer = await generateHotelTicketPDF(booking, booking.hotelId);
+
+                await sendEmail({
+                    to: user.email,
+                    subject: `Hotel Booking Confirmed - Payment Received`,
+                    html: `
+            <h2>🏨 Booking Confirmed & Payment Received!</h2>
+            <p>Dear ${user.name},</p>
+            <p>Your payment has been successfully received. Your hotel booking is now confirmed.</p>
+            <p><strong>Booking Details:</strong></p>
+            <ul>
+              <li>Hotel: ${booking.hotelId.name}, ${booking.hotelId.city}</li>
+              <li>Check-in: ${new Date(booking.checkInDate).toDateString()}</li>
+              <li>Check-out: ${new Date(booking.checkOutDate).toDateString()}</li>
+              <li>Number of Nights: ${booking.nights}</li>
+              <li>Total Amount: ₹${booking.totalPrice}</li>
+            </ul>
+            <p>Your booking confirmation PDF is attached.</p>
+            <p>Thank you for using TravelEase!</p>
+          `,
+                    attachments: [
+                        {
+                            filename: `hotel-booking-${booking._id}.pdf`,
+                            content: pdfBuffer,
+                        },
+                    ],
+                });
+            } else {
+                const pdfBuffer = await generateFlightTicketPDF(
+                    booking,
+                    booking.flightId,
+                    booking.returnFlightId
+                );
+
+                await sendEmail({
+                    to: user.email,
+                    subject: `Flight Booking Confirmed - Payment Received`,
+                    html: `
+            <h2>✈ Booking Confirmed & Payment Received!</h2>
+            <p>Dear ${user.name},</p>
+            <p>Your payment has been successfully received. Your flight booking is now confirmed.</p>
+            <p><strong>Flight Details:</strong></p>
+            <ul>
+              <li>Flight: ${booking.flightId.flightNumber} (${booking.flightId.airline})</li>
+              <li>Route: ${booking.flightId.source} → ${booking.flightId.destination}</li>
+              <li>Departure: ${new Date(booking.flightId.departureTime).toLocaleString()}</li>
+              <li>Passengers: ${booking.passengers.length}</li>
+              <li>Total Amount: ₹${booking.totalPrice}</li>
+            </ul>
+            <p>Your booking confirmation PDF is attached.</p>
+            <p>Thank you for using TravelEase!</p>
+          `,
+                    attachments: [
+                        {
+                            filename: `flight-booking-${booking._id}.pdf`,
+                            content: pdfBuffer,
+                        },
+                    ],
+                });
+            }
+        } catch (emailErr) {
+            console.error('❌ Email send failed:', emailErr.message);
+            // Booking is still confirmed even if email fails
+        }
+
         res.json({
             message: 'Payment verified successfully',
             payment,
@@ -285,6 +368,30 @@ exports.cancelAndRefund = async (req, res) => {
         payment.errorMessage = '';
         await payment.save();
 
+
+        try {
+            const user = await User.findById(req.user._id);
+            await sendEmail({
+                to: user.email,
+                subject: 'Refund Request Initiated - TravelEase',
+                html: `
+      <h2>💰 Refund Request Initiated</h2>
+      <p>Dear ${user.name},</p>
+      <p>Your refund request has been initiated and is being processed.</p>
+      <p><strong>Refund Details:</strong></p>
+      <ul>
+        <li>Refund Amount: ₹${refundAmount}</li>
+        <li>Type: ${isFullRefund ? 'Full' : 'Partial'}</li>
+        <li>Status: Processing</li>
+      </ul>
+      <p>You will receive another email once the refund is complete.</p>
+      <p>Thank you for using TravelEase!</p>
+    `,
+            });
+        } catch (emailErr) {
+            console.error('Email failed:', emailErr);
+        }
+
         try {
             console.log(payment.transactionId);
             const razorpayRefund = await razorpay.payments.refund(payment.transactionId, {
@@ -301,6 +408,29 @@ exports.cancelAndRefund = async (req, res) => {
             payment.paymentStatus = 'refunded';
             payment.refundedAt = new Date();
             await payment.save();
+            try {
+                const user = await User.findById(req.user._id);
+                await sendEmail({
+                    to: user.email,
+                    subject: `${isFullRefund ? 'Full' : 'Partial'} Refund Completed - TravelEase`,
+                    html: `
+      <h2>✅ Refund Completed</h2>
+      <p>Dear ${user.name},</p>
+      <p>Your refund has been successfully processed.</p>
+      <p><strong>Refund Details:</strong></p>
+      <ul>
+        <li>Refund ID: ${razorpayRefund.id}</li>
+        <li>Amount Refunded: ₹${refundAmount}</li>
+        <li>Type: ${isFullRefund ? 'Full' : 'Partial'}</li>
+        <li>Processed On: ${new Date().toLocaleString()}</li>
+      </ul>
+      <p>The refund will be credited to your original payment method within 3-5 business days.</p>
+      <p>Thank you for using TravelEase!</p>
+    `,
+                });
+            } catch (emailErr) {
+                console.error('Email failed:', emailErr);
+            }
 
             // Update booking status to refunded/cancelled
             const Model = payment.bookingType === 'HotelBooking' ? HotelBooking : FlightBooking;
@@ -366,52 +496,52 @@ exports.cancelAndRefund = async (req, res) => {
 };
 
 exports.handleWebhook = async (req, res) => {
-  try {
-    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-    const shasum = crypto.createHmac('sha256', secret);
-    shasum.update(JSON.stringify(req.body));
-    const digest = shasum.digest('hex');
+    try {
+        const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+        const shasum = crypto.createHmac('sha256', secret);
+        shasum.update(JSON.stringify(req.body));
+        const digest = shasum.digest('hex');
 
-    if (digest !== req.headers['x-razorpay-signature']) {
-      return res.status(400).json({ message: 'Webhook signature verification failed' });
+        if (digest !== req.headers['x-razorpay-signature']) {
+            return res.status(400).json({ message: 'Webhook signature verification failed' });
+        }
+
+        const event = req.body;
+
+        if (event.event === 'payment.authorized' || event.event === 'payment.captured') {
+            const payment = await Payment.findOne({
+                transactionId: event.payload.payment.entity.id
+            });
+
+            if (payment && payment.paymentStatus !== 'paid') {
+                payment.paymentStatus = 'paid';
+                payment.paidAt = new Date();
+                payment.webhookVerified = true;
+                await payment.save();
+
+                const Model = payment.bookingType === 'HotelBooking' ? HotelBooking : FlightBooking;
+                await Model.findByIdAndUpdate(payment.bookingId, {
+                    paymentStatus: 'paid',
+                    bookingStatus: 'confirmed',
+                });
+            }
+        }
+
+        if (event.event === 'refund.created' || event.event === 'refund.completed') {
+            const payment = await Payment.findOne({
+                refundId: event.payload.refund.entity.id
+            });
+
+            if (payment) {
+                payment.paymentStatus = 'refunded';
+                payment.refundedAt = new Date();
+                payment.webhookVerified = true;
+                await payment.save();
+            }
+        }
+
+        res.json({ message: 'Webhook processed' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-
-    const event = req.body;
-
-    if (event.event === 'payment.authorized' || event.event === 'payment.captured') {
-      const payment = await Payment.findOne({ 
-        transactionId: event.payload.payment.entity.id 
-      });
-
-      if (payment && payment.paymentStatus !== 'paid') {
-        payment.paymentStatus = 'paid';
-        payment.paidAt = new Date();
-        payment.webhookVerified = true;
-        await payment.save();
-
-        const Model = payment.bookingType === 'HotelBooking' ? HotelBooking : FlightBooking;
-        await Model.findByIdAndUpdate(payment.bookingId, {
-          paymentStatus: 'paid',
-          bookingStatus: 'confirmed',
-        });
-      }
-    }
-
-    if (event.event === 'refund.created' || event.event === 'refund.completed') {
-      const payment = await Payment.findOne({
-        refundId: event.payload.refund.entity.id
-      });
-
-      if (payment) {
-        payment.paymentStatus = 'refunded';
-        payment.refundedAt = new Date();
-        payment.webhookVerified = true;
-        await payment.save();
-      }
-    }
-
-    res.json({ message: 'Webhook processed' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
 };

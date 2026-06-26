@@ -10,4 +10,5 @@ router.post('/',protect,adminOnly,createHotel);
 router.put('/:id',protect,adminOnly,updateHotel);
 router.delete('/:id',protect,adminOnly,deleteHotel);
 router.post("/:id/reviews", protect, addReview);
+
 module.exports = router;
