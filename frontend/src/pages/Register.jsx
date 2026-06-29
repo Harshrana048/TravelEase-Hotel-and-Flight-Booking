@@ -1,15 +1,17 @@
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { register } from '../redux/slices/authSlices';
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
+import { register } from "../redux/slices/authSlices";
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword:"",
+    phone: "",
+
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -21,12 +23,16 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+    toast.error("Passwords do not match");
+    return;
+  }
     try {
       await dispatch(register(formData)).unwrap();
-      toast.success('Registered successfully');
-      navigate('/');
+      toast.success("Registered successfully");
+      navigate("/");
     } catch (err) {
-      toast.error(err || 'Registration failed');
+      toast.error(err || "Registration failed");
     }
   };
 
@@ -77,6 +83,17 @@ export default function Register() {
               required
             />
           </div>
+          <div>
+             <label className="block font-medium mb-2">Password</label>          
+            <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-3"
+          />
+          </div>
 
           <div>
             <label className="block font-medium mb-2">Phone</label>
@@ -94,12 +111,12 @@ export default function Register() {
             disabled={loading}
             className="w-full bg-primary text-white py-2 rounded font-bold hover:bg-blue-700 transition disabled:opacity-50"
           >
-            {loading ? 'Registering...' : 'Register'}
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
         <p className="text-center mt-4">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link to="/login" className="text-primary font-bold hover:underline">
             Login
           </Link>

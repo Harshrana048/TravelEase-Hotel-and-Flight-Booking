@@ -3,39 +3,40 @@ import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import {Navbar,Footer,ProtectedRoute} from './components/index'
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Hotels from './pages/Hotel';
-import Flights from './pages/Flight';
-import Dashboard from './pages/DashBoard';
+import {Home,Login,Register,Flights,Dashboard,Hotels,HotelDetail,FlightDetail} from './pages/index'
 function App() {
-  
-
-  return (
+    return (
     <BrowserRouter>
-      <Navbar />
-      <Toaster position="top-right" />
-      <main className="min-h-screen">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/hotels" element={<Hotels />} />
-          <Route path="/flights" element={<Flights />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </main>
-      <Footer />
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+
+        <Toaster position="top-right" />
+
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/hotels" element={<Hotels />} />
+            <Route path="/hotels/:id" element={<HotelDetail />} />
+            <Route path="/flights" element={<Flights />} />
+            <Route path="/Flights/:id" element={<FlightDetail />} />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+
+        <Footer />
+      </div>
     </BrowserRouter>
   );
-}
+  }
 
 export default App
