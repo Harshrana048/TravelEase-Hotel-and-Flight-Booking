@@ -7,5 +7,8 @@ import Dashboard from './Dashboard';
 import Hotels from './Hotels'
 import HotelDetail from './HotelDetail';
 import FlightDetail from './FlightDetail';
-
-export {Home,Login,Register,Flights,Dashboard,Hotels,HotelDetail,FlightDetail}
+import BookFlight from './BookFlight';
+import BookHotel from './BookHotel';
+import PaymentFailure from './PaymentFailure';
+import PaymentSuccess from './PaymentSuccess';
+export {Home,Login,Register,Flights,Dashboard,Hotels,HotelDetail,FlightDetail,BookFlight,BookHotel,PaymentFailure,PaymentSuccess}
