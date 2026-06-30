@@ -37,8 +37,8 @@ export default function Login() {
 
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80"
-          alt=""
+          src="/images/login-bg.jpg"
+         alt="Travel Background" 
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(96,165,250,0.22),transparent_35%),linear-gradient(115deg,rgba(2,6,23,0.95),rgba(2,6,23,0.72),rgba(15,23,42,0.78))]" />
@@ -47,7 +47,7 @@ export default function Login() {
       <div className="relative z-10 min-h-screen">
         <div className="mx-auto flex min-h-screen max-w-[1600px] items-center justify-center px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
           <div className="grid w-full gap-10 lg:grid-cols-[1.05fr_0.95fr] xl:grid-cols-[1.1fr_0.9fr]">
-            <section className="hidden rounded-[2rem] border border-white/15 bg-slate-950/45 text-white shadow-[0_25px_80px_-20px_rgba(2,6,23,0.75)] backdrop-blur-xl md:flex md:flex-col md:justify-between md:overflow-hidden">
+            <section className="hidden rounded-4xl border border-white/15 bg-slate-950/45 text-white shadow-[0_25px_80px_-20px_rgba(2,6,23,0.75)] backdrop-blur-xl md:flex md:flex-col md:justify-between md:overflow-hidden">
               <div className="relative h-full p-10">
                 <div className="absolute inset-0 bg-slate-950/70" />
                 <div className="relative z-10 flex h-full flex-col justify-between">
@@ -97,7 +97,7 @@ export default function Login() {
             </section>
 
             <section className="flex items-center justify-center">
-              <div className="w-full max-w-[480px] rounded-[2rem] bg-white/95 p-8 shadow-[0_35px_90px_-24px_rgba(15,23,42,0.35)] ring-1 ring-slate-200/80 backdrop-blur-sm sm:p-10">
+              <div className="w-full max-w-120 rounded-4xl bg-white/95 p-8 shadow-[0_35px_90px_-24px_rgba(15,23,42,0.35)] ring-1 ring-slate-200/80 backdrop-blur-sm sm:p-10">
                 <div className="mb-8">
                   <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
                     TravelEase
@@ -149,7 +149,7 @@ export default function Login() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#2563EB] via-[#3B82F6] to-[#60A5FA] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_-12px_rgba(37,99,235,0.45)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_50px_-12px_rgba(37,99,235,0.55)] focus:outline-none focus:ring-4 focus:ring-[#2563EB]/20 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full items-center justify-center rounded-xl bg-linear-to-r from-[#2563EB] via-[#3B82F6] to-[#60A5FA] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_-12px_rgba(37,99,235,0.45)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_50px_-12px_rgba(37,99,235,0.55)] focus:outline-none focus:ring-4 focus:ring-[#2563EB]/20 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? "Logging in..." : "Login"}
                   </button>
