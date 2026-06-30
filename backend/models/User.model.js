@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user',
     },
+    wishlist: {
+    hotels:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' }],
+    flights: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flight' }],
+  },
 }, { timestamps: true });
 
 userSchema.pre('save',async function(){
