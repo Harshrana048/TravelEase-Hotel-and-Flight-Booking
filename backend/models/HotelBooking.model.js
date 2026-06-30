@@ -75,7 +75,12 @@ const hotelBookingSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'paid','refund_pending', 'refunded'],
     default: 'pending'
-  }
+  },
+  paymentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Payment',
+    default: null,
+  },
 
 }, { timestamps: true });
 

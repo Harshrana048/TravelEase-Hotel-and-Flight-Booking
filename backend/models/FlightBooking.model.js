@@ -19,6 +19,11 @@ const flightBookingSchema = new mongoose.Schema({
   paymentStatus:  { type: String, enum: ['pending', 'paid','refund_pending', 'refunded'], default: 'pending' },
   tripType:       { type: String, enum: ['one-way', 'round-trip'], default: 'one-way' },
   returnFlightId: { type: mongoose.Schema.Types.ObjectId, ref: 'Flight', default: null },
+  paymentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Payment',
+    default: null,
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('FlightBooking', flightBookingSchema);

@@ -2,7 +2,10 @@ const HotelBooking = require('../models/HotelBooking.model');
 const FlightBooking = require('../models/FlightBooking.model');
 const Hotel = require('../models/hotel.model');
 const Flight = require('../models/Flight.model');
-
+const {
+  generateHotelTicketPDF,
+  generateFlightTicketPDF,
+} = require("../utils/generatePDF");
 
 exports.bookHotel = async (req, res) => {
     try {
@@ -182,6 +185,76 @@ exports.getMyBookings = async (req, res) => {
 
     }
 }
+exports.downloadTicket = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { type } = req.query;
+
+    if (type === "HotelBooking") {
+      const booking = await HotelBooking.findById(bookingId);
+
+      if (!booking) {
+        return res.status(404).json({
+          message: "Booking not found",
+        });
+      }
+
+      const hotel = await Hotel.findById(booking.hotelId);
+
+      const pdfBuffer = await generateHotelTicketPDF(booking, hotel);
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=hotel-ticket-${booking._id}.pdf`
+      );
+
+      return res.send(pdfBuffer);
+    }
+
+    if (type === "FlightBooking") {
+      const booking = await FlightBooking.findById(bookingId);
+
+      if (!booking) {
+        return res.status(404).json({
+          message: "Booking not found",
+        });
+      }
+
+      const flight = await Flight.findById(booking.flightId);
+
+      let returnFlight = null;
+
+      if (booking.returnFlightId) {
+        returnFlight = await Flight.findById(
+          booking.returnFlightId
+        );
+      }
+
+      const pdfBuffer = await generateFlightTicketPDF(
+        booking,
+        flight,
+        returnFlight
+      );
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=flight-ticket-${booking._id}.pdf`
+      );
+
+      return res.send(pdfBuffer);
+    }
+
+    return res.status(400).json({
+      message: "Invalid booking type",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
 
 exports.cancelBookings = async (req, res) => {
     try {

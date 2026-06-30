@@ -183,6 +183,7 @@ exports.verifyPayment = async (req, res) => {
         {
           paymentStatus: 'paid',
           bookingStatus: 'confirmed',
+           paymentId: payment._id
         },
         { new: true }
       ).populate('hotelId');
@@ -192,6 +193,7 @@ exports.verifyPayment = async (req, res) => {
         {
           paymentStatus: 'paid',
           bookingStatus: 'confirmed',
+           paymentId: payment._id
         },
         { new: true }
       ).populate('flightId');
