@@ -38,8 +38,23 @@ exports.register = async (req, res) => {
         message: 'User with this email already exists',
       });
     }
-
-    // 4. Create the user
+    // 3. check if phone number is 10 digit and already exists
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid 10-digit phone number',
+      });
+    }
+    const existingPhoneUser = await User.findOne({ phone });
+    if (existingPhoneUser) {
+      return res.status(409).json({
+        success: false,
+        message: 'User with this phone number already exists',
+      });
+    }
+  
+  // 4. Create the user
     const user = await User.create({
       name,
       email,
