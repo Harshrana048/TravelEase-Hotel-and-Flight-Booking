@@ -1,11 +1,11 @@
-
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import {Navbar,Footer,ProtectedRoute} from './components/index'
-import {Home,Login,Register,Flights,Dashboard,Hotels,HotelDetail,FlightDetail,BookFlight,BookHotel,PaymentFailure,PaymentSuccess} from './pages/index'
+import { Navbar, Footer, ProtectedRoute } from './components/index'
+import { Home, Login, Register, Flights, Dashboard, Hotels, HotelDetail, FlightDetail, BookFlight, BookHotel, PaymentFailure, PaymentSuccess } from './pages/index'
+
 function App() {
-    return (
+  return (
     <BrowserRouter>
       <div className="min-h-screen flex flex-col">
         <Navbar />
@@ -17,30 +17,36 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
+            {/* Hotels */}
             <Route path="/hotels" element={<Hotels />} />
             <Route path="/hotels/:id" element={<HotelDetail />} />
             <Route
-            path="/book-hotel/:id"
-            element={
-              <ProtectedRoute>
-                <BookHotel />
-              </ProtectedRoute>
-            }
-          />
-            <Route path="/flights" element={<Flights />} />
-            <Route path="/Flights/:id" element={<FlightDetail />} />
-             <Route
-            path="/book-flight/:id"
-            element={
-              <ProtectedRoute>
-                <BookFlight />
-              </ProtectedRoute>
-            }
-          />
-           <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/payment-failure" element={<PaymentFailure />} />
+              path="/book-hotel/:id"
+              element={
+                <ProtectedRoute>
+                  <BookHotel />
+                </ProtectedRoute>
+              }
+            />
             
-
+            {/* Flights */}
+            <Route path="/flights" element={<Flights />} />
+            <Route path="/flights/:id" element={<FlightDetail />} /> {/* ✅ Fixed: lowercase */}
+            <Route
+              path="/book-flight/:id"
+              element={
+                <ProtectedRoute>
+                  <BookFlight />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Payment */}
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-failure" element={<PaymentFailure />} />
+            
+            {/* Dashboard */}
             <Route
               path="/dashboard"
               element={
@@ -56,6 +62,6 @@ function App() {
       </div>
     </BrowserRouter>
   );
-  }
+}
 
 export default App

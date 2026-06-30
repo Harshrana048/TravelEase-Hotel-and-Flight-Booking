@@ -57,7 +57,7 @@ const downloadPDF = async (bookingId, bookingType) => {
 };
 
 
-function BookingCard() {
+function BookingCard({booking,type}) {
     const [showCancelModal, setShowCancelModal] = useState(false);
   const isHotel = type === 'hotel';
     return (

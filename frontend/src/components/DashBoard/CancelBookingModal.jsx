@@ -1,7 +1,6 @@
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
-import { cancelAndRefundBooking } from '../redux/slices/dashboardSlice';
-
+import { cancelAndRefundBooking } from '../../redux/slices/dashboardSlice';
 export default function CancelBookingModal({ booking, bookingType, onClose }) {
   const dispatch = useDispatch();
 

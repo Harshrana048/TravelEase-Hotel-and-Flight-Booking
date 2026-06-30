@@ -38,17 +38,7 @@ export const cancelAndRefundBooking = createAsyncThunk(
   }
 );
 
-export const updateProfile = createAsyncThunk(
-  'dashboard/updateProfile',
-  async (profileData, { rejectWithValue }) => {
-    try {
-      const { data } = await api.put('/auth/profile', profileData);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to update profile');
-    }
-  }
-);
+
 
 export const removeFromWishlist = createAsyncThunk(
   'dashboard/removeFromWishlist',
@@ -102,7 +92,6 @@ const dashboardSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // ✅ FIXED: Handle cancelAndRefundBooking instead of cancelBooking
       .addCase(cancelAndRefundBooking.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -115,17 +104,6 @@ const dashboardSlice = createSlice({
         state.flightBookings = state.flightBookings.filter((b) => b._id !== bookingId);
       })
       .addCase(cancelAndRefundBooking.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(updateProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateProfile.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(updateProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

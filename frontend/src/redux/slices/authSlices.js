@@ -6,6 +6,9 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const { data } = await api.post('/auth/login', credentials);
+      if (!data || !data.token || !data.user) {
+        return rejectWithValue('Invalid response from server');
+      }
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       return data;
@@ -20,6 +23,9 @@ export const register = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const { data } = await api.post('/auth/register', userData);
+      if (!data || !data.token || !data.user) {
+        return rejectWithValue('Invalid response from server');
+      }
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       return data;
@@ -29,12 +35,24 @@ export const register = createAsyncThunk(
   }
 );
 
-const initialState =  {
-    user: JSON.parse(localStorage.getItem('user')) || null,
-    token: localStorage.getItem('token') || null,
-    loading: false,
-    error: null,
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (profileData, { rejectWithValue }) => {
+    try {
+      const { data } = await api.put('/auth/profile', profileData);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to update profile');
+    }
   }
+);
+
+const initialState = {
+  user: JSON.parse(localStorage.getItem('user')) || null,
+  token: localStorage.getItem('token') || null,
+  loading: false,
+  error: null,
+}
 
 const authSlice = createSlice({
   name: 'auth',
@@ -50,6 +68,7 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+
   },
   extraReducers: (builder) => {
     builder
@@ -78,9 +97,25 @@ const authSlice = createSlice({
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        localStorage.setItem(
+          "user",
+          JSON.stringify(action.payload)
+        );
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError} = authSlice.actions;
 export default authSlice.reducer;

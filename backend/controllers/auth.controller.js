@@ -50,7 +50,7 @@ exports.register = async (req, res) => {
     const token = signToken(user._id);
 
     // 5. Respond (never send password back)
-    res.status(201).json({ token, user: { id: user._id, name, email, role: user.role } });
+    res.status(201).json({ token, user: { id: user._id, name, email,  phone: user.phone,role: user.role } });
 
   } catch (error) {
     console.error('Register error:', error.message);
@@ -73,7 +73,7 @@ exports.getlogin = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
     const token = signToken(user._id);
-    res.json({ token, user: { id: user._id, name: user.name, email, role: user.role } });
+    res.json({ token, user: { id: user._id, name: user.name, email, role: user.role , phone:user.phone, } });
 
 
 

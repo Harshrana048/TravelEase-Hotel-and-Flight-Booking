@@ -3,6 +3,7 @@ import authReducer from './slices/authSlices'
 import hotelReducer from './slices/hotelSlice'
 import FlightReducer from './slices/flightSlice'
 import bookingReducer from './slices/bookingSlice'
+import DashboardReducer from './slices/dashboardSlice';
 
 export const store = configureStore({
     reducer:{ 
@@ -10,6 +11,7 @@ export const store = configureStore({
         hotels: hotelReducer,
         flights: FlightReducer,
         booking: bookingReducer,
+        dashboard: DashboardReducer
 
     },
 

@@ -169,7 +169,7 @@ exports.bookFlight = async (req, res) => {
 
 exports.getMyBookings = async (req, res) => {
     try {
-        const [hotelBooking, flightBooking] = await Promise.all([
+        const [hotelBookings, flightBookings] = await Promise.all([
             HotelBooking.find({ userId: req.user._id })
                 .populate('hotelId', 'name city images pricePerNight address')
                 .sort({ createdAt: -1 }),
@@ -178,7 +178,7 @@ exports.getMyBookings = async (req, res) => {
                 .sort({ createdAt: -1 }),
         ])
 
-        res.json({ hotelBooking, flightBooking })
+        res.json({ hotelBookings, flightBookings })
 
     } catch (error) {
         res.status(500).json({ message: error.message });

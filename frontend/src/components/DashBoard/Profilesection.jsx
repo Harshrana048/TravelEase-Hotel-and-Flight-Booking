@@ -1,19 +1,27 @@
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import toast from 'react-hot-toast';
-import { updateProfile } from '../../redux/slices/dashboardSlice';
-
-
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import { updateProfile } from "../../redux/slices/authSlices";
 
 function ProfileSection() {
-const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
   });
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      });
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,22 +31,22 @@ const { user } = useSelector((state) => state.auth);
     e.preventDefault();
     try {
       await dispatch(updateProfile(formData)).unwrap();
-      toast.success('Profile updated successfully');
+      toast.success("Profile updated successfully");
       setIsEditing(false);
     } catch (err) {
-      toast.error(err || 'Failed to update profile');
+      toast.error(err || "Failed to update profile");
     }
   };
 
-    return (
-         <div className="bg-white p-6 rounded shadow">
+  return (
+    <div className="bg-white p-6 rounded shadow">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">My Profile</h2>
         <button
           onClick={() => setIsEditing(!isEditing)}
           className="text-primary font-medium hover:underline"
         >
-          {isEditing ? 'Cancel' : 'Edit'}
+          {isEditing ? "Cancel" : "Edit"}
         </button>
       </div>
 
@@ -54,7 +62,9 @@ const { user } = useSelector((state) => state.auth);
           </div>
           <div>
             <label className="text-gray-600 text-sm">Phone</label>
-            <p className="text-lg font-semibold">{user?.phone || 'Not provided'}</p>
+            <p className="text-lg font-semibold">
+              {user?.phone || "Not provided"}
+            </p>
           </div>
         </div>
       ) : (
@@ -79,7 +89,9 @@ const { user } = useSelector((state) => state.auth);
               disabled
               className="w-full border rounded px-4 py-2 bg-gray-100 cursor-not-allowed"
             />
-            <p className="text-gray-600 text-sm mt-1">Email cannot be changed</p>
+            <p className="text-gray-600 text-sm mt-1">
+              Email cannot be changed
+            </p>
           </div>
           <div>
             <label className="block font-medium mb-2">Phone</label>
@@ -100,8 +112,7 @@ const { user } = useSelector((state) => state.auth);
         </form>
       )}
     </div>
-        
-    );
+  );
 }
 
-export default ProfileSection
+export default ProfileSection;
