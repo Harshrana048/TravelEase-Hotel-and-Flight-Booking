@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const calculateDuration = (departure, arrival) => {
   const diff = new Date(arrival) - new Date(departure);
@@ -8,87 +8,97 @@ const calculateDuration = (departure, arrival) => {
 };
 
 const formatTime = (date) => {
-  return new Date(date).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Date(date).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
   });
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 };
 
+function FlightCard({ flight }) {
+  const duration = calculateDuration(flight.departureTime, flight.arrivalTime);
+  const flightStops = flight.stops !== undefined ? flight.stops : null;
+  const stopLabel =
+    flightStops === 0
+      ? "Non-stop"
+      : flightStops
+        ? `${flightStops} stop${flightStops > 1 ? "s" : ""}`
+        : "Direct";
 
-
-function FlightCard({flight}) {
-    const duration = calculateDuration(flight.departureTime , flight.arrivalTime);
-
-    return (
-      <div className="bg-white rounded shadow-lg hover:shadow-2xl transition p-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4 pb-4 border-b">
-        <div>
-          <h3 className="text-lg font-bold">{flight.airline}</h3>
-          <p className="text-gray-600 text-sm">{flight.flightNumber}</p>
-        </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold text-primary">₹{flight.price}</p>
-          <p className="text-gray-600 text-sm">{flight.class}</p>
-        </div>
-      </div>
-
-      {/* Flight Details */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        {/* Departure */}
-        <div>
-          <p className="text-gray-600 text-xs mb-1">Departure</p>
-          <p className="text-xl font-bold">{formatTime(flight.departureTime)}</p>
-          <p className="text-gray-600 text-sm font-medium">{flight.source}</p>
-          <p className="text-gray-400 text-xs">{formatDate(flight.departureTime)}</p>
-        </div>
-
-        {/* Duration */}
-        <div className="flex flex-col items-center justify-center">
-          <p className="text-gray-600 text-xs mb-2">Duration</p>
-          <p className="text-lg font-bold">{duration}</p>
-          <div className="w-full h-1 bg-gray-300 rounded my-2"></div>
-          <p className="text-gray-600 text-xs">Non-stop</p>
-        </div>
-
-        {/* Arrival */}
-        <div className="text-right">
-          <p className="text-gray-600 text-xs mb-1">Arrival</p>
-          <p className="text-xl font-bold">{formatTime(flight.arrivalTime)}</p>
-          <p className="text-gray-600 text-sm font-medium">{flight.destination}</p>
-          <p className="text-gray-400 text-xs">{formatDate(flight.arrivalTime)}</p>
-        </div>
-      </div>
-
-      {/* Availability */}
-      <div className="mb-4 pb-4 border-b">
-        <p className="text-sm text-gray-600">
-          {flight.availableSeats > 0 ? (
-            <span className="text-success font-medium">
-              {flight.availableSeats} seats available
-            </span>
+  return (
+    <Link
+      to={`/flights/${flight._id}`}
+      className="group grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] items-center gap-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:border-sky-300 hover:shadow-lg"
+    >
+      {/* Airline */}
+      <div className="flex items-center gap-4 lg:w-56">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-lg font-bold text-slate-700">
+          {flight.logo ? (
+            <img
+              src={flight.logo}
+              alt={flight.airline}
+              className="h-9 w-9 object-contain"
+            />
           ) : (
-            <span className="text-danger font-medium">Sold Out</span>
+            flight.airline?.slice(0, 2).toUpperCase() || "FL"
           )}
-        </p>
+        </div>
+        <div>
+          <p className="font-semibold text-slate-900">{flight.airline}</p>
+          <p className="text-sm text-slate-500">
+            {flight.flightNumber} · {flight.class}
+          </p>
+        </div>
       </div>
 
-      {/* View Button */}
-      <Link
-        to={`/flights/${flight._id}`}
-        className="w-full bg-primary text-white py-2 rounded font-bold text-center block hover:bg-blue-700 transition"
-      >
-        View Details
-      </Link>
-    </div>      
-    );
+      {/* Timeline */}
+      <div className="flex items-center justify-between gap-4 lg:gap-8">
+        <div className="text-left">
+          <p className="text-xl font-bold text-slate-900 tabular-nums">
+            {formatTime(flight.departureTime)}
+          </p>
+          <p className="text-sm text-slate-500">{flight.source}</p>
+        </div>
+
+        <div className="flex flex-1 flex-col items-center px-2">
+          <p className="text-xs text-slate-500">{duration}</p>
+          <div className="relative my-1.5 h-px w-full min-w-[60px] bg-slate-300">
+            <div className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-sky-600" />
+            <div className="absolute right-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-sky-600" />
+          </div>
+          <p className="text-xs font-medium text-slate-500">{stopLabel}</p>
+        </div>
+
+        <div className="text-right">
+          <p className="text-xl font-bold text-slate-900 tabular-nums">
+            {formatTime(flight.arrivalTime)}
+          </p>
+          <p className="text-sm text-slate-500">{flight.destination}</p>
+        </div>
+      </div>
+
+      {/* Price / action */}
+      <div className="flex flex-col items-start gap-2 lg:items-end lg:border-l lg:border-slate-100 lg:pl-6">
+        <p className="text-xs text-slate-400">{formatDate(flight.departureTime)}</p>
+        <p className="text-2xl font-bold text-slate-900">
+          ₹{flight.price}
+          <span className="ml-1 text-xs font-normal text-slate-400">/ person</span>
+        </p>
+        <p className="text-xs text-slate-500">{flight.availableSeats ?? 0} seats left</p>
+        <span className="mt-1 inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition group-hover:bg-sky-700">
+          Select
+        </span>
+      </div>
+    </Link>
+  );
 }
 
-export default FlightCard
+export default FlightCard;

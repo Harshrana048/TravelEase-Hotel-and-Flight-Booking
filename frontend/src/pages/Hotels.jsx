@@ -36,7 +36,7 @@ export default function Hotels() {
                 confidence — all in one place.
               </p>
             </div>
-            <div className="flex-shrink-0 rounded-2xl bg-blue-50 px-8 py-5 text-center">
+            <div className="shrink-0 rounded-2xl bg-blue-50 px-8 py-5 text-center">
               <p className="text-sm text-blue-500 font-medium">Available properties</p>
               <p className="mt-1 text-4xl font-bold text-blue-700">
                 {total ?? hotels.length}

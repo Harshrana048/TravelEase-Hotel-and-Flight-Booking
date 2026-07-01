@@ -130,7 +130,7 @@ export default function Home() {
         {/* Background image */}
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80"
+            src="images/home-bg.jpg"
             alt="Scenic travel destination"
             className="h-full w-full object-cover opacity-50"
           />
@@ -318,7 +318,7 @@ export default function Home() {
                       No image
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <p className="font-semibold text-white">{dest.city}</p>
@@ -428,7 +428,7 @@ export default function Home() {
                         📍 {hotel.city}
                       </p>
                     </div>
-                    <span className="flex-shrink-0 rounded-xl bg-blue-50 px-3 py-1.5 text-sm font-bold text-blue-700">
+                    <span className="shrink-0 rounded-xl bg-blue-50 px-3 py-1.5 text-sm font-bold text-blue-700">
                       ₹{hotel.pricePerNight?.toLocaleString("en-IN")}
                       <span className="font-normal text-blue-500"> /night</span>
                     </span>
