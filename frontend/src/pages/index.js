@@ -19,4 +19,7 @@ import BookFlight from './BookFlight';
 import BookHotel from './BookHotel';
 import PaymentFailure from './PaymentFailure';
 import PaymentSuccess from './PaymentSuccess';
-export { Home, Login, Register, AboutUs, Careers, HelpCenter, Contact, PrivacyPolicy, TermsOfService, CookiesPolicy, LegalDisclaimer, Flights, Dashboard, Hotels, HotelDetail, FlightDetail, BookFlight, BookHotel, PaymentFailure, PaymentSuccess }
+import Admin from './Admin';
+export { Home, Login, Register, AboutUs, Careers, HelpCenter, Contact, PrivacyPolicy, 
+    TermsOfService, CookiesPolicy, LegalDisclaimer, Flights, Dashboard, Hotels, 
+    HotelDetail, FlightDetail, BookFlight, BookHotel, PaymentFailure, PaymentSuccess,Admin }

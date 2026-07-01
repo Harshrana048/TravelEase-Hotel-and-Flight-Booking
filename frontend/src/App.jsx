@@ -23,6 +23,7 @@ import {
   BookHotel,
   PaymentFailure,
   PaymentSuccess,
+  Admin,
 } from "./pages/index";
 
 function AppContent() {
@@ -36,11 +37,13 @@ function AppContent() {
 
       <Toaster position="top-right" />
 
-      <main className="flex-1 ">
+      <main className="flex-1">
         <Routes>
+          {/* Core */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
           {/* Hotels */}
           <Route path="/hotels" element={<Hotels />} />
           <Route path="/hotels/:id" element={<HotelDetail />} />
@@ -52,10 +55,10 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+
           {/* Flights */}
           <Route path="/flights" element={<Flights />} />
-          <Route path="/flights/:id" element={<FlightDetail />} />{" "}
-          {/* ✅ Fixed: lowercase */}
+          <Route path="/flights/:id" element={<FlightDetail />} />
           <Route
             path="/book-flight/:id"
             element={
@@ -64,9 +67,11 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+
           {/* Payment */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-failure" element={<PaymentFailure />} />
+
           {/* Dashboard */}
           <Route
             path="/dashboard"
@@ -76,6 +81,26 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Company */}
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+
+          {/* Legal */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/cookies-policy" element={<CookiesPolicy />} />
+          <Route path="/legal-disclaimer" element={<LegalDisclaimer />} />
         </Routes>
       </main>
 

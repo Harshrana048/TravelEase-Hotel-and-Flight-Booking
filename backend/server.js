@@ -12,6 +12,7 @@ const bookingRoutes = require('./routes/booking.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const { notFound } = require('./middleware/404Notfound');
 const wishlistRoutes = require('./routes/wishlist.routes')
+const adminRoutes = require('./routes/admin.routes')
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use('/api/flights',flightRoutes);
 app.use('/api/bookings',bookingRoutes);
 app.use('/api/payments',paymentRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/admin',adminRoutes);
 
 
 // error

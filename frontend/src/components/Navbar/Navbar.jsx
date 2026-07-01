@@ -36,11 +36,13 @@ function Navbar() {
     navigate("/");
   };
 
+  // ✅ BUILD navItems dynamically based on user role
   const navItems = [
     { label: "Home", to: "/" },
     { label: "Hotels", to: "/hotels" },
     { label: "Flights", to: "/flights" },
-    { label: "Dashboard", to: "/dashboard" },
+    ...(token ? [{ label: "Dashboard", to: "/dashboard" }] : []),
+    ...(token && user?.role === 'admin' ? [{ label: "Admin Panel", to: "/admin" }] : []),
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -74,12 +76,23 @@ function Navbar() {
                   isActive(item.to)
                     ? "text-blue-600 bg-blue-50"
                     : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                } ${
+                  // ✅ Highlight admin link in yellow
+                  item.label === "Admin Panel" && isActive(item.to)
+                    ? "text-yellow-600 bg-yellow-50"
+                    : item.label === "Admin Panel"
+                    ? "text-yellow-600 hover:bg-yellow-50"
+                    : ""
                 }`}
               >
                 {item.label}
                 {/* Active dot indicator */}
                 {isActive(item.to) && (
-                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600" />
+                  <span
+                    className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${
+                      item.label === "Admin Panel" ? "bg-yellow-600" : "bg-blue-600"
+                    }`}
+                  />
                 )}
               </Link>
             ))}
@@ -87,6 +100,11 @@ function Navbar() {
 
           {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-2">
+            {token && user && (
+              <span className="text-sm text-slate-600 mr-2">
+                {user.name}
+              </span>
+            )}
             {token ? (
               <button
                 onClick={handleLogout}
@@ -151,12 +169,18 @@ function Navbar() {
                 to={item.to}
                 className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                   isActive(item.to)
-                    ? "bg-blue-50 text-blue-600"
+                    ? item.label === "Admin Panel"
+                      ? "bg-yellow-50 text-yellow-600"
+                      : "bg-blue-50 text-blue-600"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
                 {isActive(item.to) && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 flex-shrink-0" />
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                      item.label === "Admin Panel" ? "bg-yellow-600" : "bg-blue-600"
+                    }`}
+                  />
                 )}
                 {item.label}
               </Link>
