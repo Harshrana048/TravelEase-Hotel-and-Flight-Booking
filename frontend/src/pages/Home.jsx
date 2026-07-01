@@ -134,7 +134,7 @@ export default function Home() {
             alt="Scenic travel destination"
             className="h-full w-full object-cover opacity-50"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/70 to-slate-900/90" />
+          <div className="absolute inset-0 bg-linear-to-b from-slate-900/60 via-slate-900/70 to-slate-900/90" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-32 lg:pt-40">

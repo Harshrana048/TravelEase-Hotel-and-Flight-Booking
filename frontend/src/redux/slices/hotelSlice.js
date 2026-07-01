@@ -17,7 +17,7 @@ export const getHotels = createAsyncThunk(
         params.append("amenities", filters.amenities.join(","));
 
       params.append("page", filters.page || 1);
-      params.append("limit", filters.limit || 9);
+      params.append("limit", filters.limit || 6);
 
       const { data } = await api.get(`/hotels?${params}`);
       return data;
