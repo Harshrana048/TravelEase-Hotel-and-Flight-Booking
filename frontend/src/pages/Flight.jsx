@@ -62,7 +62,7 @@ function Flight() {
   return (
     <div className="min-h-screen bg-slate-50 px-20 py-20 sm:px-6 lg:px-10">
       <div className="mx-auto w-full max-w-5xl">
-        <div className="mb-8 rounded-[32px] bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+        <div className="mb-8 rounded-4xl bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.35em] text-sky-600">
@@ -86,7 +86,7 @@ function Flight() {
         </div>
 
         <main>
-          <div className="mb-6 rounded-[32px] bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+          <div className="mb-6 rounded-4xl bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-slate-500">
               Search route
             </p>
@@ -95,7 +95,7 @@ function Flight() {
             </h2>
           </div>
 
-          <div className="mb-8 rounded-[32px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+          <div className="mb-8 rounded-4xl bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
             <form
               onSubmit={handleSearch}
               className="grid grid-cols-1 gap-4 lg:grid-cols-[1.2fr_1.2fr_1fr_0.9fr]"
@@ -203,7 +203,7 @@ function Flight() {
           </div>
 
           {loading && (
-            <div className="rounded-[32px] bg-white p-14 text-center shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+            <div className="rounded-4xl bg-white p-14 text-center shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
               <div className="flex items-center justify-center">
                 <div className="animate-spin h-14 w-14 rounded-full border-t-2 border-b-2 border-sky-500" />
               </div>
@@ -211,7 +211,7 @@ function Flight() {
           )}
 
           {!loading && flights.length === 0 && (
-            <div className="rounded-[32px] bg-white p-14 text-center shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+            <div className="rounded-4xl bg-white p-14 text-center shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
               <p className="text-xl font-semibold text-slate-900">
                 No flights found
               </p>
@@ -234,7 +234,7 @@ function Flight() {
                   <button
                     onClick={() => dispatch(setPage(currentPage - 1))}
                     disabled={currentPage === 1}
-                    className="inline-flex h-11 min-w-[120px] items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex h-11 min-w-30 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Previous
                   </button>
@@ -258,7 +258,7 @@ function Flight() {
                   <button
                     onClick={() => dispatch(setPage(currentPage + 1))}
                     disabled={currentPage === pages}
-                    className="inline-flex h-11 min-w-[120px] items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex h-11 min-w-30 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Next
                   </button>

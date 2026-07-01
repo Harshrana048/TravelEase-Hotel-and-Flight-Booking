@@ -70,7 +70,7 @@ function FlightCard({ flight }) {
 
         <div className="flex flex-1 flex-col items-center px-2">
           <p className="text-xs text-slate-500">{duration}</p>
-          <div className="relative my-1.5 h-px w-full min-w-[60px] bg-slate-300">
+          <div className="relative my-1.5 h-px w-full min-w-15 bg-slate-300">
             <div className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-sky-600" />
             <div className="absolute right-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-sky-600" />
           </div>
