@@ -44,7 +44,7 @@ function ReviewForm({ hotelId }) {
       {/* Styled Alert Banner for missing token authentication */}
       {!token && (
         <div className="flex items-center gap-2 bg-amber-50 border border-amber-200/60 rounded-xl p-3 mb-6 text-amber-800 text-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 flex-shrink-0 text-amber-600">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 shrink-0 text-amber-600">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
           </svg>
           <span className="font-medium">Please sign in to share a rating and review.</span>

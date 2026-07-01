@@ -5,18 +5,12 @@ import toast from "react-hot-toast";
 import { ReviewForm } from "../components/index";
 import { getHotelById } from "../redux/slices/hotelSlice";
 
-/* ---------- small presentational helpers (UI only, no logic/data changes) ---------- */
-
 function StarRating({ value = 0 }) {
   const full = Math.floor(value);
   return (
     <span className="inline-flex items-center gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <svg
-          key={i}
-          viewBox="0 0 20 20"
-          className={`h-4 w-4 ${i < full ? "fill-amber-400" : "fill-gray-200"}`}
-        >
+        <svg key={i} viewBox="0 0 20 20" className={`h-4 w-4 ${i < full ? "fill-amber-400" : "fill-gray-200"}`}>
           <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1 1 5.8L10 14.9l-5.21 2.74 1-5.8-4.21-4.1 5.82-.85z" />
         </svg>
       ))}
@@ -27,11 +21,7 @@ function StarRating({ value = 0 }) {
 function LocationIcon({ className = "h-4 w-4" }) {
   return (
     <svg viewBox="0 0 20 20" className={className} fill="currentColor">
-      <path
-        fillRule="evenodd"
-        d="M10 2a6 6 0 00-6 6c0 4.2 6 10 6 10s6-5.8 6-10a6 6 0 00-6-6zm0 8.25A2.25 2.25 0 1110 5.75a2.25 2.25 0 010 4.5z"
-        clipRule="evenodd"
-      />
+      <path fillRule="evenodd" d="M10 2a6 6 0 00-6 6c0 4.2 6 10 6 10s6-5.8 6-10a6 6 0 00-6-6zm0 8.25A2.25 2.25 0 1110 5.75a2.25 2.25 0 010 4.5z" clipRule="evenodd" />
     </svg>
   );
 }
@@ -39,11 +29,7 @@ function LocationIcon({ className = "h-4 w-4" }) {
 function AmenityIcon({ className = "h-4 w-4" }) {
   return (
     <svg viewBox="0 0 20 20" className={className} fill="currentColor">
-      <path
-        fillRule="evenodd"
-        d="M16.7 5.3a1 1 0 010 1.4l-7.4 7.4a1 1 0 01-1.4 0L3.3 9.5a1 1 0 111.4-1.4l3.9 3.9 6.7-6.7a1 1 0 011.4 0z"
-        clipRule="evenodd"
-      />
+      <path fillRule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.4 7.4a1 1 0 01-1.4 0L3.3 9.5a1 1 0 111.4-1.4l3.9 3.9 6.7-6.7a1 1 0 011.4 0z" clipRule="evenodd" />
     </svg>
   );
 }
@@ -54,22 +40,15 @@ export default function HotelDetail() {
   const { currentHotel, loading, error } = useSelector((state) => state.hotels);
   const { token } = useSelector((state) => state.auth);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false); // UI-only, no data/logic change
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  useEffect(() => {
-    dispatch(getHotelById(id));
-  }, [id, dispatch]);
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-  }, [error]);
+  useEffect(() => { dispatch(getHotelById(id)); }, [id, dispatch]);
+  useEffect(() => { if (error) toast.error(error); }, [error]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-14 w-14 border-4 border-gray-200 border-t-primary"></div>
+        <div className="animate-spin rounded-full h-14 w-14 border-4 border-gray-200 border-t-blue-600" />
       </div>
     );
   }
@@ -78,10 +57,7 @@ export default function HotelDetail() {
     return (
       <div className="container py-24 text-center">
         <p className="text-xl text-gray-500 mb-3">Hotel not found</p>
-        <Link
-          to="/hotels"
-          className="text-primary font-semibold hover:underline underline-offset-4"
-        >
+        <Link to="/hotels" className="text-blue-600 font-semibold hover:underline underline-offset-4">
           Back to Hotels
         </Link>
       </div>
@@ -90,84 +66,49 @@ export default function HotelDetail() {
 
   const hotel = currentHotel;
   const images = hotel.images || [];
-  // Up to 4 side thumbnails; anything beyond that is reachable via "+N more" / the strip below
-  const thumbnails = images.slice(1, 5);
-  const extraCount = images.length - 5;
 
   return (
-    <div className="max-w-360 mx-auto px-8 py-8">
-      <div className="container py-6 md:py-10">
+    <div className="max-w-7xl mx-auto px-6 sm:px-8 py-8">
+      <div className="py-6 md:py-10">
+
+        {/* Back link */}
         <Link
           to="/hotels"
           className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors mb-6"
         >
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm text-slate-600">
             <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M12.7 15.7a1 1 0 01-1.4 0l-5-5a1 1 0 010-1.4l5-5a1 1 0 111.4 1.4L8.42 10l4.3 4.3a1 1 0 010 1.4z"
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d="M12.7 15.7a1 1 0 01-1.4 0l-5-5a1 1 0 010-1.4l5-5a1 1 0 111.4 1.4L8.42 10l4.3 4.3a1 1 0 010 1.4z" clipRule="evenodd" />
             </svg>
           </span>
           Back to Hotels
         </Link>
 
-        <div className="rounded-4xl bg-white p-6 shadow-[0_20px_80px_-45px_rgba(15,23,42,0.35)] border border-slate-200">
-          <div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr] lg:items-end">
-            <div>
-              <div className="flex flex-col gap-4 lg:gap-6">
-                <div>
-                  <h1 className="font-serif text-4xl md:text-5xl font-semibold text-slate-950 leading-tight">
-                    {hotel.name}
-                  </h1>
-                  {hotel.tagline && (
-                    <p className="mt-3 text-lg text-slate-500 max-w-2xl">
-                      {hotel.tagline}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
-                  {hotel.city && (
-                    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
-                      <LocationIcon className="h-4 w-4 text-sky-600" />
-                      {hotel.city}
-                    </span>
-                  )}
-                  {hotel.rating != null && (
-                    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
-                      <StarRating value={hotel.rating} />
-                      <span className="font-semibold text-slate-700">
-                        {hotel.rating}/5
-                      </span>
-                    </span>
-                  )}
-                  {hotel.roomsAvailable >= 0 && (
-                    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700">
-                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                      {hotel.roomsAvailable} rooms available
-                    </span>
-                  )}
-                </div>
-              </div>
+        {/* Hotel name card */}
+        <div className="rounded-3xl bg-white p-6 shadow-[0_20px_80px_-45px_rgba(15,23,42,0.35)] border border-slate-200 mb-8">
+          <h1 className="font-serif text-4xl md:text-5xl font-semibold text-slate-950 leading-tight">
+            {hotel.name}
+          </h1>
+          {hotel.tagline && (
+            <p className="mt-3 text-lg text-slate-500 max-w-2xl">{hotel.tagline}</p>
+          )}
+          {hotel.city && (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500">
+                <LocationIcon className="h-4 w-4 text-sky-600" />
+                {hotel.city}
+              </span>
             </div>
-
-            
-          </div>
+          )}
         </div>
 
-        {/* ---------- Gallery ---------- */}
+        {/* Gallery — main image + thumbnail strip only, NO aside here */}
         {images.length > 0 && (
-          <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:h-120">
-            {/* Main image — always full height, always the largest element.
-                Width adapts depending on whether there are side thumbnails to show. */}
+          <>
             <button
               type="button"
               onClick={() => setLightboxOpen(true)}
-              className={`group relative overflow-hidden rounded-4xl bg-slate-200 h-72 sm:h-96 lg:h-full ${
-                thumbnails.length > 0 ? "lg:w-2/3" : "lg:w-full"
-              }`}
+              className="group relative w-full overflow-hidden rounded-3xl bg-slate-200 h-72 sm:h-96 lg:h-[480px] block"
             >
               {images[selectedImage] ? (
                 <img
@@ -176,39 +117,29 @@ export default function HotelDetail() {
                   className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-105"
                 />
               ) : (
-                <span className="flex h-full items-center justify-center text-slate-400">
-                  No Image
-                </span>
+                <span className="flex h-full items-center justify-center text-slate-400">No Image</span>
               )}
             </button>
 
-            {/* Side thumbnails — a flex column so 1, 2, 3 or 4 thumbnails always share the
-                full column height evenly, with no leftover empty space. */}
-            
-                      
-          </div>
+            {images.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-2 mt-4">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-colors ${
+                      selectedImage === idx ? "border-blue-500" : "border-transparent hover:border-slate-300"
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
-        {/* Thumbnail strip (keeps original select-image functionality, all images) */}
-        {images.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-2 mt-4 mb-10">
-            {images.map((img, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedImage(idx)}
-                className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
-                  selectedImage === idx
-                    ? "border-primary"
-                    : "border-transparent hover:border-gray-300"
-                }`}
-              >
-                <img src={img} alt="" className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* ---------- Lightbox ---------- */}
+        {/* Lightbox */}
         {lightboxOpen && (
           <div
             className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
@@ -230,17 +161,16 @@ export default function HotelDetail() {
           </div>
         )}
 
-        {/* ---------- Content ---------- */}
-        <div className="mt-10 grid gap-10 lg:grid-cols-[1.75fr_0.95fr]">
-          <div className="space-y-10">
+        {/* ── Content + Sticky Sidebar ── */}
+        {/* items-start is the critical prop — without it the aside stretches to row height and sticky breaks */}
+        <div className="mt-10 grid gap-10 lg:grid-cols-[1.75fr_0.95fr] items-start">
+
+          {/* LEFT: main content */}
+          <div className="space-y-8">
             {hotel.description && (
               <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-                <h2 className="text-3xl font-semibold text-slate-950 mb-4">
-                  About this stay
-                </h2>
-                <p className="text-slate-600 leading-8 whitespace-pre-line">
-                  {hotel.description}
-                </p>
+                <h2 className="text-3xl font-semibold text-slate-950 mb-4">About this stay</h2>
+                <p className="text-slate-600 leading-8 whitespace-pre-line">{hotel.description}</p>
               </section>
             )}
 
@@ -251,27 +181,20 @@ export default function HotelDetail() {
                     <LocationIcon className="h-5 w-5" />
                   </span>
                   <div>
-                    <h2 className="text-2xl font-semibold text-slate-950 mb-2">
-                      Location
-                    </h2>
+                    <h2 className="text-2xl font-semibold text-slate-950 mb-2">Location</h2>
                     <p className="text-slate-600 leading-7">{hotel.address}</p>
                   </div>
                 </div>
               </section>
             )}
 
-            {hotel.amenities && hotel.amenities.length > 0 && (
+            {hotel.amenities?.length > 0 && (
               <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-                <h2 className="text-2xl font-semibold text-slate-950 mb-5">
-                  Amenities
-                </h2>
+                <h2 className="text-2xl font-semibold text-slate-950 mb-5">Amenities</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {hotel.amenities.map((amenity, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700"
-                    >
-                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">
+                    <div key={idx} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
                         <AmenityIcon className="h-4 w-4" />
                       </span>
                       {amenity}
@@ -284,179 +207,144 @@ export default function HotelDetail() {
             <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-2xl font-semibold text-slate-950">
-                    Availability
-                  </h2>
-                  <p className="mt-2 text-slate-600">
-                    Real-time room availability for this property.
-                  </p>
+                  <h2 className="text-2xl font-semibold text-slate-950">Availability</h2>
+                  <p className="mt-2 text-slate-600">Real-time room availability for this property.</p>
                 </div>
-                <div
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
-                    hotel.roomsAvailable > 0
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-rose-100 text-rose-700"
-                  }`}
-                >
-                  <span
-                    className={`h-2.5 w-2.5 rounded-full ${hotel.roomsAvailable > 0 ? "bg-emerald-500" : "bg-rose-500"}`}
-                  />
-                  {hotel.roomsAvailable > 0
-                    ? `${hotel.roomsAvailable} rooms available`
-                    : "No rooms available"}
+                <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${hotel.roomsAvailable > 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
+                  <span className={`h-2.5 w-2.5 rounded-full ${hotel.roomsAvailable > 0 ? "bg-emerald-500" : "bg-rose-500"}`} />
+                  {hotel.roomsAvailable > 0 ? `${hotel.roomsAvailable} rooms available` : "No rooms available"}
                 </div>
               </div>
             </section>
 
+            {/* Reviews */}
             <section>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-3xl font-semibold text-slate-950">
-                    Reviews
-                  </h2>
-                  {hotel.reviews && hotel.reviews.length > 0 && (
-                    <p className="mt-1 text-slate-500">
-                      {hotel.reviews.length} guest review
-                      {hotel.reviews.length > 1 ? "s" : ""}
-                    </p>
+                  <h2 className="text-3xl font-semibold text-slate-950">Reviews</h2>
+                  {hotel.reviews?.length > 0 && (
+                    <p className="mt-1 text-slate-500">{hotel.reviews.length} guest review{hotel.reviews.length > 1 ? "s" : ""}</p>
                   )}
                 </div>
               </div>
 
-              {hotel.reviews && hotel.reviews.length > 0 ? (
+              {hotel.reviews?.length > 0 ? (
                 <div className="space-y-4 mb-8">
                   {hotel.reviews.map((review, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-                    >
+                    <div key={idx} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-slate-900">
-                            {review.userName}
-                          </h3>
-                          <p className="text-sm text-slate-500">
-                            {new Date(review.createdAt).toLocaleDateString()}
-                          </p>
+                          <h3 className="text-lg font-semibold text-slate-900">{review.userName}</h3>
+                          <p className="text-sm text-slate-500">{new Date(review.createdAt).toLocaleDateString()}</p>
                         </div>
                         <div className="flex items-center gap-2 text-slate-700">
                           <StarRating value={review.rating} />
-                          <span className="text-sm font-semibold">
-                            {review.rating}/5
-                          </span>
+                          <span className="text-sm font-semibold">{review.rating}/5</span>
                         </div>
                       </div>
-                      <p className="mt-4 text-slate-600 leading-7">
-                        {review.comment}
-                      </p>
+                      <p className="mt-4 text-slate-600 leading-7">{review.comment}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-sm">
+                <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-sm mb-8">
                   No reviews yet
                 </div>
               )}
 
-              <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <ReviewForm hotelId={id} />
               </div>
             </section>
           </div>
 
-          <aside className="space-y-6 lg:sticky lg:top-6">
-            <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.25)]">
-              <div className="flex items-center justify-between gap-4">
+          {/* RIGHT: sticky booking sidebar — moved out of the gallery, lives here now */}
+          <aside className="sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain space-y-5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+            <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_20px_50px_-20px_rgba(15,23,42,0.08)]">
+              {/* Price & Rating */}
+              <div className="flex items-end justify-between gap-4 pb-5 border-b border-gray-100">
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-slate-500">
-                    Price per night
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold text-slate-950">
-                    ₹{hotel.pricePerNight}
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Price per night</p>
+                  <p className="mt-1.5 text-3xl font-extrabold text-gray-900 tracking-tight">
+                    ₹{Number(hotel.pricePerNight).toLocaleString("en-IN")}
                   </p>
                 </div>
                 {hotel.rating != null && (
-                  <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
-                    <StarRating value={hotel.rating} />
-                    <span>{hotel.rating}</span>
+                  <div className="inline-flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 border border-amber-200/40">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-amber-500">
+                      <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" />
+                    </svg>
+                    <span>{hotel.rating} / 5</span>
                   </div>
                 )}
               </div>
 
-              <div className="mt-6 rounded-3xl bg-slate-50 p-5">
-                <p className="text-sm text-slate-500">Location</p>
-                {hotel.address && (
-                  <p className="mt-2 text-slate-700">{hotel.address}</p>
-                )}
+              {/* Info blocks */}
+              <div className="mt-5 space-y-3">
+                <div className="rounded-2xl bg-gray-50/70 border border-gray-100/50 p-4 flex gap-3 items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 text-gray-400 mt-0.5 shrink-0">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                  </svg>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Location</p>
+                    <p className="mt-0.5 text-xs font-medium text-gray-700 leading-relaxed">
+                      {hotel.address || "Address not provided"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl bg-gray-50/70 border border-gray-100/50 p-4 flex gap-3 items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 text-gray-400 shrink-0">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5v15m6-15v15m-10.5-3h15m-15-6h15m-15-6h15" />
+                  </svg>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Rooms Available</p>
+                    <p className={`mt-0.5 text-sm font-bold ${hotel.roomsAvailable > 0 ? "text-emerald-600" : "text-rose-600"}`}>
+                      {hotel.roomsAvailable ?? 0} rooms remaining
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-4 rounded-3xl bg-slate-50 p-5">
-                <p className="text-sm text-slate-500">Rooms available</p>
-                <p className="mt-2 text-lg font-semibold text-slate-950">
-                  {hotel.roomsAvailable ?? 0}
-                </p>
-              </div>
-
-              <div className="mt-6">
+              {/* CTA */}
+              <div className="mt-5">
                 {token ? (
                   <Link
                     to={`/book-hotel/${id}`}
-                    className={`inline-flex w-full items-center justify-center rounded-3xl bg-sky-700 px-5 py-4 text-sm font-semibold text-white shadow-lg shadow-sky-700/20 transition hover:bg-sky-800 ${
-                      hotel.roomsAvailable > 0
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed opacity-70"
+                    className={`inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/10 transition-all duration-200 hover:bg-blue-700 active:scale-[0.99] ${
+                      hotel.roomsAvailable > 0 ? "" : "cursor-not-allowed opacity-50 pointer-events-none"
                     }`}
                   >
-                    {hotel.roomsAvailable > 0 ? "Book Now" : "Unavailable"}
+                    {hotel.roomsAvailable > 0 ? "Book Now" : "Sold Out"}
                   </Link>
                 ) : (
                   <Link
                     to="/login"
-                    className="inline-flex w-full items-center justify-center rounded-3xl bg-sky-700 px-5 py-4 text-sm font-semibold text-white shadow-lg shadow-sky-700/20 transition hover:bg-sky-800"
+                    className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/10 transition-all duration-200 hover:bg-blue-700 active:scale-[0.99]"
                   >
                     Login to Book
                   </Link>
                 )}
               </div>
 
-              <p className="mt-3 text-center text-sm text-slate-500">
+              <p className="mt-3 text-center text-[11px] font-medium text-gray-400">
                 You won't be charged yet
               </p>
 
-              <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-                <p className="font-semibold text-slate-900">Secure booking</p>
-                <p className="mt-1">
-                  Your details are protected and never shared.
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-4xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start gap-3">
-                <div className="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-sky-100 text-sky-700">
-                  <svg
-                    viewBox="0 0 20 20"
-                    className="h-5 w-5"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.7 5.3a1 1 0 010 1.4l-7.4 7.4a1 1 0 01-1.4 0L3.3 9.5a1 1 0 111.4-1.4l3.9 3.9 6.7-6.7a1 1 0 011.4 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-lg font-semibold text-slate-950">
-                    Best price guarantee
-                  </p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    We match prices if you find a lower rate.
-                  </p>
+              {/* Secure badge */}
+              <div className="mt-5 rounded-2xl bg-slate-50/50 border border-slate-100 p-4 flex gap-3 items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 text-blue-600 shrink-0 mt-0.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+                <div className="text-xs">
+                  <p className="font-bold text-gray-800">Secure booking</p>
+                  <p className="mt-0.5 text-gray-500 leading-normal">Your details are protected and encrypted securely.</p>
                 </div>
               </div>
             </div>
           </aside>
+
         </div>
       </div>
     </div>
