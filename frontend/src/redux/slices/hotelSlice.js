@@ -4,25 +4,29 @@ import api from '../../services/api';
 
 
 export const getHotels = createAsyncThunk(
-    '/hotels/getHotels',
-    async (filters, { rejectWithValue }) => {
-        try {
-            const params = new URLSearchParams;
-            if (filters.city) params.append('city', filters.city);
-            if (filters.minPrice) params.append('minPrice', filters.minPrice);
-            if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-            if (filters.rating) params.append('rating', filters.rating);
-            if (filters.amenities?.length) params.append('amenities', filters.amenities.join(','));
-            params.append('page', filters.page || 1);
-            params.append('limit', 9);
+  "/hotels/getHotels",
+  async (filters = {}, { rejectWithValue }) => {
+    try {
+      const params = new URLSearchParams();
 
-            const {data} = await api.get(`/hotels?${params}`);
-            return data;
-        } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Failed to fetch hotels');
+      if (filters.city) params.append("city", filters.city);
+      if (filters.minPrice) params.append("minPrice", filters.minPrice);
+      if (filters.maxPrice) params.append("maxPrice", filters.maxPrice);
+      if (filters.rating) params.append("rating", filters.rating);
+      if (filters.amenities?.length)
+        params.append("amenities", filters.amenities.join(","));
 
-        }
+      params.append("page", filters.page || 1);
+      params.append("limit", filters.limit || 9);
+
+      const { data } = await api.get(`/hotels?${params}`);
+      return data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch hotels"
+      );
     }
+  }
 );
 
 export const getHotelById = createAsyncThunk(
