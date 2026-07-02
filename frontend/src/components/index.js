@@ -15,10 +15,11 @@ import FlightManagement from "./Admin/FlightManagement";
 import UserManagement from "./Admin/UserManagement";
 
 import HotelManagement from "./Admin/HotelMangement";
+import ReviewModal from "./Flight/ReviewModal";
 
 
 
 export  {Navbar , Footer , ProtectedRoute , HotelCard , HotelFilters , ReviewForm, FlightCard,ProfileSection,
 BookingCard,MyBookings,WishlistSection, AdminStats,BookingManagement,FlightManagement,UserManagement
-,HotelManagement,
+,HotelManagement,ReviewModal
 }
