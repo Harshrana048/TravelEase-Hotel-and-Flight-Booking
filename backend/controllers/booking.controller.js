@@ -47,7 +47,7 @@ exports.bookHotel = async (req, res) => {
         const hotel = await Hotel.findById(hotelId);
         if (!hotel) return res.status(404).json({ message: 'Hotel not found' });
 
-        // Check if enough rooms available
+        // // Check if enough rooms available
 
         if (hotel.roomsAvailable < roomsBooked) {
             return res.status(400).json({
@@ -55,7 +55,7 @@ exports.bookHotel = async (req, res) => {
             });
         }
 
-        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+         const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
         const totalPrice = nights * hotel.pricePerNight * roomsBooked;
 
         // create Booking
@@ -76,8 +76,8 @@ exports.bookHotel = async (req, res) => {
 
         });
         // Reduce room availability
-        hotel.roomsAvailable -= roomsBooked;
-        await hotel.save();
+        // hotel.roomsAvailable -= roomsBooked;
+        // await hotel.save();
 
         res.status(201).json(booking);
 
@@ -132,17 +132,14 @@ exports.bookFlight = async (req, res) => {
             : flight.price * passengerCount;
 
         // Generate seat numbers for each passenger
-        const seatNumbers = [];
-        for (let i = 0; i < passengerCount; i++) {
-            seatNumbers.push(`S${flight.availableSeats - i}`);
-        }
+       
 
         const booking = await FlightBooking.create({
             userId: req.user._id,
             flightId,
             passengers,
             passengerCount,
-            seatNumbers,
+            seatNumbers: "",
             totalPrice,
             bookingStatus: 'pending',      
             paymentStatus: 'pending',
@@ -150,14 +147,7 @@ exports.bookFlight = async (req, res) => {
             returnFlightId: tripType === 'round-trip' ? returnFlightId : null,
         });
 
-        flight.availableSeats -= passengerCount;
-        await flight.save();
-
-        if (returnFlight) {
-            returnFlight.availableSeats -= passengerCount;
-            await returnFlight.save();
-        }
-
+       
         res.status(201).json(booking);
 
 

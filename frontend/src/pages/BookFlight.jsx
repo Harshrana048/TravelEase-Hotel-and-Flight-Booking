@@ -113,67 +113,80 @@ export default function BookFlight() {
   };
 
   /* ── Original handleSubmit logic, now called from review modal ── */
-  const handleProceedToPayment = async () => {
-    try {
-      const result = await dispatch(
-        bookFlight({
-          flightId: id,
-          passengers: formData.passengers,
-          tripType: formData.tripType,
-          returnFlightId: formData.returnFlightId || undefined,
-        }),
-      ).unwrap();
+ const handleProceedToPayment = async () => {
+  try {
+    // 1. Initiate a Pending Reference Booking (Locks the seat on the backend)
+    const result = await dispatch(
+      bookFlight({
+        flightId: id,
+        passengers: formData.passengers,
+        tripType: formData.tripType,
+        returnFlightId: formData.returnFlightId || undefined,
+      }),
+    ).unwrap();
 
-      toast.success("Flight booked successfully! Proceeding to payment...");
+    // Changed text to reflect it's holding the seat, not fully booked yet
+    toast.success("Seat held! Proceeding to payment gateway...");
 
-      const paymentResult = await dispatch(
-        createPaymentOrder({ bookingId: result._id, bookingType: "FlightBooking" }),
-      ).unwrap();
+    // 2. Create the Razorpay Order via your server backend
+    const paymentResult = await dispatch(
+      createPaymentOrder({ bookingId: result._id, bookingType: "FlightBooking" }),
+    ).unwrap();
 
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      document.body.appendChild(script);
+    // 3. Inject and mount Razorpay Checkout Script dynamically
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    document.body.appendChild(script);
 
-      script.onload = () => {
-        const options = {
-          key: paymentResult.key,
-          amount: paymentResult.amount * 100,
-          currency: "INR",
-          name: "TravelEase",
-          description: `Flight Booking - ${currentFlight.flightNumber}`,
-          order_id: paymentResult.orderId,
-          handler: async (response) => {
-            try {
-              const verifyResult = await dispatch(
-                verifyPayment({
-                  orderId: response.razorpay_order_id,
-                  paymentId: response.razorpay_payment_id,
-                  signature: response.razorpay_signature,
-                  bookingId: result._id,
-                  bookingType: "HotelBooking",
-                }),
-              ).unwrap();
-              toast.success("Payment verified! Redirecting...");
-              setTimeout(() => {
-                navigate("/payment-success", { state: { bookingId: result._id, bookingType: "HotelBooking" } });
-              }, 1000);
-            } catch (err) {
-              const errorMsg = typeof err === "string" ? err : err?.message || "Payment verification failed";
-              toast.error(errorMsg);
-              setTimeout(() => { navigate("/payment-failure", { state: { error: errorMsg } }); }, 1000);
-            }
-          },
-          prefill: { email: user?.email, contact: formData.passengers[0]?.phone },
-          theme: { color: "#1d4ed8" },
-        };
-        const razorpay = new window.Razorpay(options);
-        razorpay.open();
+    script.onload = () => {
+      const options = {
+        key: paymentResult.key,
+        amount: paymentResult.amount * 100, // Razorpay takes amounts in subunits (paise)
+        currency: "INR",
+        name: "TravelEase",
+        description: `Flight Booking - ${currentFlight.flightNumber}`,
+        order_id: paymentResult.orderId,
+        handler: async (response) => {
+          try {
+            // 4. Verify Payment Signatures (This transforms the backend state from 'PENDING' to 'CONFIRMED')
+            const verifyResult = await dispatch(
+              verifyPayment({
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                bookingId: result._id,
+                bookingType: "FlightBooking", // FIX: Was mistakenly "HotelBooking"
+              }),
+            ).unwrap();
+            
+            toast.success("Payment verified! Flight booked successfully.");
+            
+            setTimeout(() => {
+              navigate("/payment-success", { 
+                state: { bookingId: result._id, bookingType: "FlightBooking" } // FIX: Was mistakenly "HotelBooking"
+              });
+            }, 1000);
+          } catch (err) {
+            const errorMsg = typeof err === "string" ? err : err?.message || "Payment verification failed";
+            toast.error(errorMsg);
+            setTimeout(() => { navigate("/payment-failure", { state: { error: errorMsg } }); }, 1000);
+          }
+        },
+        prefill: { 
+          email: user?.email, 
+          contact: formData.passengers[0]?.phone || "" 
+        },
+        theme: { color: "#1d4ed8" }, // Clean corporate travel blue theme
       };
-    } catch (err) {
-      const errorMsg = typeof err === "string" ? err : err?.message || "Failed to book flight";
-      toast.error(errorMsg);
-    }
-  };
+      
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    };
+  } catch (err) {
+    const errorMsg = typeof err === "string" ? err : err?.message || "Failed to initiate booking";
+    toast.error(errorMsg);
+  }
+};
 
   /* ── Loading / not found states ── */
   if (flightLoading) {

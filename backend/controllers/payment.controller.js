@@ -121,101 +121,180 @@ exports.createOrder = async (req, res) => {
 };
 
 exports.verifyPayment = async (req, res) => {
-  try {
-    const { orderId, paymentId, signature, bookingId, bookingType } = req.body;
-
-    
-
-    if (!orderId || !paymentId || !signature) {
-      return res.status(400).json({ 
-        message: 'orderId, paymentId, and signature are required' 
-      });
-    }
-
-    // Verify signature
-    const hmac = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(`${orderId}|${paymentId}`)
-      .digest('hex');
-
-  
-
-    // In test/dev mode, allow mismatched signatures
-    if (hmac !== signature && process.env.NODE_ENV === 'production') {
-      return res.status(400).json({ 
-        message: 'Payment signature verification failed' 
-      });
-    }
-
-    // Find payment
-    const payment = await Payment.findOne({ 
-      orderId, 
-      userId: req.user._id,
-      bookingId
-    });
-
-
-
-    if (!payment) {
-      return res.status(404).json({ message: 'Payment record not found' });
-    }
-
-    if (payment.paymentStatus === 'paid') {
-      return res.status(400).json({ 
-        message: 'This payment has already been verified' 
-      });
-    }
-
-    // Update payment
-    payment.transactionId = paymentId;
-    payment.signature = signature;
-    payment.paymentStatus = 'paid';
-    payment.paidAt = new Date();
-    await payment.save();
-
-
-    // Update booking based on type
-    let booking;
-    
-    if (payment.bookingType === 'HotelBooking') {
-      booking = await HotelBooking.findByIdAndUpdate(
-        payment.bookingId,
-        {
-          paymentStatus: 'paid',
-          bookingStatus: 'confirmed',
-           paymentId: payment._id
-        },
-        { new: true }
-      ).populate('hotelId');
-    } else {
-      booking = await FlightBooking.findByIdAndUpdate(
-        payment.bookingId,
-        {
-          paymentStatus: 'paid',
-          bookingStatus: 'confirmed',
-           paymentId: payment._id
-        },
-        { new: true }
-      ).populate('flightId');
-      
-      // Populate returnFlightId if it exists
-      if (booking.returnFlightId) {
-        booking = await booking.populate('returnFlightId');
-      }
-    }
-
-    
-
-    // Send email
     try {
-      const user = await User.findById(req.user._id);
-      
-      if (payment.bookingType === 'HotelBooking') {
-        const pdfBuffer = await generateHotelTicketPDF(booking, booking.hotelId);
-        await sendEmail({
-          to: user.email,
-          subject: `Hotel Booking Confirmed - Payment Received`,
-          html: `
+        const { orderId, paymentId, signature, bookingId, bookingType } = req.body;
+
+
+
+        if (!orderId || !paymentId || !signature) {
+            return res.status(400).json({
+                message: 'orderId, paymentId, and signature are required'
+            });
+        }
+
+        // Verify signature
+        const hmac = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(`${orderId}|${paymentId}`)
+            .digest('hex');
+
+
+
+        // In test/dev mode, allow mismatched signatures
+        if (hmac !== signature && process.env.NODE_ENV === 'production') {
+            return res.status(400).json({
+                message: 'Payment signature verification failed'
+            });
+        }
+
+        // Find payment
+        const payment = await Payment.findOne({
+            orderId,
+            userId: req.user._id,
+            bookingId
+        });
+
+
+
+        if (!payment) {
+            return res.status(404).json({ message: 'Payment record not found' });
+        }
+
+        if (payment.paymentStatus === 'paid') {
+            return res.status(400).json({
+                message: 'This payment has already been verified'
+            });
+        }
+
+        // Update payment
+        payment.transactionId = paymentId;
+        payment.signature = signature;
+        payment.paymentStatus = 'paid';
+        payment.paidAt = new Date();
+        await payment.save();
+
+
+        // Update booking based on type
+        let booking;
+
+        if (payment.bookingType === 'HotelBooking') {
+        const pendingBooking = await HotelBooking.findById(payment.bookingId);
+    if (!pendingBooking) return res.status(404).json({ message: 'Hotel booking record not found' });
+
+    // 2. Extract values securely from the database document
+    const hotelId = pendingBooking.hotelId;
+    const roomsBooked = pendingBooking.roomsBooked || 1; // Fallback to 1 if named differently in schema
+   
+    // 3. Find the live hotel inventory record
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) return res.status(404).json({ message: 'Hotel not found' });
+    
+    // Check if enough rooms are still available
+    if (hotel.roomsAvailable < roomsBooked) {
+        return res.status(400).json({
+            message: `Only ${hotel.roomsAvailable} rooms available, you need ${roomsBooked}`
+        });
+    }
+
+
+    // 5. Update statuses, track payment ID, and lock in the total price
+    booking = await HotelBooking.findByIdAndUpdate(
+        payment.bookingId,
+        {
+            paymentStatus: 'paid',
+            bookingStatus: 'confirmed',
+            paymentId: payment._id,
+           
+        },
+        { new: true }
+    ).populate('hotelId');
+
+    // 6. Reduce rooms availability pool using $inc for safer concurrency management
+    if (booking && booking.hotelId) {
+        await Hotel.findByIdAndUpdate(booking.hotelId._id, {
+            $inc: { roomsAvailable: -roomsBooked }
+        });
+    }
+        } else {
+            // 1. Fetch the raw flight first to see current seat availability numbers
+            const pendingBooking = await FlightBooking.findById(payment.bookingId);
+            if (!pendingBooking) return res.status(404).json({ message: 'Booking record not found' });
+
+            // 2. Extract the variables securely from the database document
+            const passengerCount = pendingBooking.passengerCount;
+            const flightId = pendingBooking.flightId;
+            const tripType = pendingBooking.tripType;
+            const returnFlightId = pendingBooking.returnFlightId;
+
+            // 3. Now search for the live flight using that extracted flightId
+            const flight = await Flight.findById(flightId);
+            if (!flight) return res.status(404).json({ message: 'Flight not found' });
+
+            // Check if enough seats for all passengers
+            if (flight.availableSeats < passengerCount) {
+                return res.status(400).json({
+                    message: `Only ${flight.availableSeats} seats available, you need ${passengerCount}`
+                });
+            }
+
+            // For round-trip, validate return flight too
+            let returnFlight = null;
+            if (tripType === 'round-trip' && returnFlightId) {
+                returnFlight = await Flight.findById(returnFlightId);
+                if (!returnFlight) return res.status(404).json({ message: 'Return flight not found' });
+                if (returnFlight.availableSeats < passengerCount) {
+                    return res.status(400).json({
+                        message: `Only ${returnFlight.availableSeats} seats available on return flight`
+                    });
+                }
+            }
+            const seatNumbers = [];
+            for (let i = 0; i < passengerCount; i++) {
+                seatNumbers.push(`S${flight.availableSeats - i}`);
+            }
+
+            booking = await FlightBooking.findByIdAndUpdate(
+                payment.bookingId,
+                {
+                    paymentStatus: 'paid',
+                    bookingStatus: 'confirmed',
+                    paymentId: payment._id,
+                    seatNumbers: seatNumbers,
+                },
+                { new: true }
+            ).populate('flightId');
+
+            // Populate returnFlightId if it exists
+            if (booking.returnFlightId) {
+                booking = await booking.populate('returnFlightId');
+            }
+
+            if (booking && booking.flightId) {
+                await Flight.findByIdAndUpdate(booking.flightId._id, {
+                    $inc: { availableSeats: -booking.passengerCount }
+                });
+            }
+
+            // Also reduce available seats on the return flight if it's a round-trip
+            if (booking && booking.tripType === 'round-trip' && booking.returnFlightId) {
+                await Flight.findByIdAndUpdate(booking.returnFlightId._id, {
+                    $inc: { availableSeats: -booking.passengerCount }
+                });
+            }
+        }
+
+
+
+        // Send email
+        try {
+            const user = await User.findById(req.user._id);
+
+            if (payment.bookingType === 'HotelBooking') {
+                const pdfBuffer = await generateHotelTicketPDF(booking, booking.hotelId);
+                await sendEmail({
+                    to: user.email,
+                    subject: `Hotel Booking Confirmed - Payment Received`,
+                    html: `
             <h2>🏨 Booking Confirmed & Payment Received!</h2>
             <p>Dear ${user.name},</p>
             <p>Your payment has been successfully received. Your hotel booking is now confirmed.</p>
@@ -230,23 +309,23 @@ exports.verifyPayment = async (req, res) => {
             <p>Your booking confirmation PDF is attached.</p>
             <p>Thank you for using TravelEase!</p>
           `,
-          attachments: [
-            {
-              filename: `hotel-booking-${booking._id}.pdf`,
-              content: pdfBuffer,
-            },
-          ],
-        });
-      } else {
-        const pdfBuffer = await generateFlightTicketPDF(
-          booking, 
-          booking.flightId, 
-          booking.returnFlightId
-        );
-        await sendEmail({
-          to: user.email,
-          subject: `Flight Booking Confirmed - Payment Received`,
-          html: `
+                    attachments: [
+                        {
+                            filename: `hotel-booking-${booking._id}.pdf`,
+                            content: pdfBuffer,
+                        },
+                    ],
+                });
+            } else {
+                const pdfBuffer = await generateFlightTicketPDF(
+                    booking,
+                    booking.flightId,
+                    booking.returnFlightId
+                );
+                await sendEmail({
+                    to: user.email,
+                    subject: `Flight Booking Confirmed - Payment Received`,
+                    html: `
             <h2>✈ Booking Confirmed & Payment Received!</h2>
             <p>Dear ${user.name},</p>
             <p>Your payment has been successfully received. Your flight booking is now confirmed.</p>
@@ -261,29 +340,29 @@ exports.verifyPayment = async (req, res) => {
             <p>Your booking confirmation PDF is attached.</p>
             <p>Thank you for using TravelEase!</p>
           `,
-          attachments: [
-            {
-              filename: `flight-booking-${booking._id}.pdf`,
-              content: pdfBuffer,
-            },
-          ],
-        });
-      }
-      
-    } catch (emailErr) {
-      console.error('⚠️ Email Failed:', emailErr.message);
-      // Don't fail payment if email fails
-    }
+                    attachments: [
+                        {
+                            filename: `flight-booking-${booking._id}.pdf`,
+                            content: pdfBuffer,
+                        },
+                    ],
+                });
+            }
 
-    res.json({ 
-      message: 'Payment verified successfully',
-      payment,
-      booking,
-    });
-  } catch (err) {
-    console.error('❌ Verification Error:', err.message);
-    res.status(500).json({ message: err.message });
-  }
+        } catch (emailErr) {
+            console.error('⚠️ Email Failed:', emailErr.message);
+            // Don't fail payment if email fails
+        }
+
+        res.json({
+            message: 'Payment verified successfully',
+            payment,
+            booking,
+        });
+    } catch (err) {
+        console.error('❌ Verification Error:', err.message);
+        res.status(500).json({ message: err.message });
+    }
 };
 
 // POST /api/payments/payment-failed
