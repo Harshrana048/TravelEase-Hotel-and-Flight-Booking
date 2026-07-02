@@ -41,7 +41,7 @@ function Navbar() {
     { label: "Home", to: "/" },
     { label: "Hotels", to: "/hotels" },
     { label: "Flights", to: "/flights" },
-    ...(token ? [{ label: "Dashboard", to: "/dashboard" }] : []),
+    ...(token && user?.role === 'user' ? [{ label: "Dashboard", to: "/dashboard" }] : []),
     ...(token && user?.role === 'admin' ? [{ label: "Admin Panel", to: "/admin" }] : []),
   ];
 

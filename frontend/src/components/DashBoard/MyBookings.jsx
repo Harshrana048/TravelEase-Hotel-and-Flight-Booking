@@ -1,82 +1,75 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import BookingCard from './BookingCard';
+import { useSelector } from "react-redux";
+import BookingCard from "./BookingCard";
+import EmptyState from "./EmptyState";
 
+export default function MyBookings({
+  hotelBookings: providedHotelBookings,
+  flightBookings: providedFlightBookings,
+}) {
+  const dashboard = useSelector((state) => state.dashboard);
+  const hotelBookings = providedHotelBookings ?? dashboard.hotelBookings ?? [];
+  const flightBookings = providedFlightBookings ?? dashboard.flightBookings ?? [];
+  const totalBookings = hotelBookings.length + flightBookings.length;
 
-
-function MyBookings() {
-
-    const dispatch = useDispatch();
-  const { hotelBookings, flightBookings, loading } = useSelector(
-    (state) => state.dashboard
-  );
-
-    if (loading) {
+  if (dashboard.loading && !providedHotelBookings && !providedFlightBookings) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="flex min-h-95 items-center justify-center rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
       </div>
     );
   }
 
-  const totalBookings = hotelBookings.length + flightBookings.length;
+  if (totalBookings === 0) {
+    return <EmptyState title="No bookings yet." action="Explore Hotels" to="/hotels" />;
+  }
 
-     return (
-    <div>
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-blue-50 p-4 rounded">
-          <p className="text-gray-600 text-sm">Total Bookings</p>
-          <p className="text-3xl font-bold text-primary">{totalBookings}</p>
-        </div>
-        <div className="bg-green-50 p-4 rounded">
-          <p className="text-gray-600 text-sm">Hotel Bookings</p>
-          <p className="text-3xl font-bold text-success">{hotelBookings.length}</p>
-        </div>
-        <div className="bg-purple-50 p-4 rounded">
-          <p className="text-gray-600 text-sm">Flight Bookings</p>
-          <p className="text-3xl font-bold text-purple-600">{flightBookings.length}</p>
-        </div>
-      </div>
-
-      {/* Hotel Bookings */}
+  return (
+    <div className="space-y-8">
       {hotelBookings.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold mb-4">🏨 Hotel Bookings</h3>
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
+                Stays
+              </p>
+              <h2 className="mt-1 text-2xl font-black text-slate-950">
+                Hotel Bookings
+              </h2>
+            </div>
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-bold text-blue-600">
+              {hotelBookings.length}
+            </span>
+          </div>
           <div className="space-y-4">
             {hotelBookings.map((booking) => (
               <BookingCard key={booking._id} booking={booking} type="hotel" />
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Flight Bookings */}
       {flightBookings.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold mb-4">✈ Flight Bookings</h3>
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
+                Flights
+              </p>
+              <h2 className="mt-1 text-2xl font-black text-slate-950">
+                Flight Bookings
+              </h2>
+            </div>
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-bold text-blue-600">
+              {flightBookings.length}
+            </span>
+          </div>
           <div className="space-y-4">
             {flightBookings.map((booking) => (
               <BookingCard key={booking._id} booking={booking} type="flight" />
             ))}
           </div>
-        </div>
-      )}
-
-      {/* No Bookings */}
-      {totalBookings === 0 && (
-        <div className="text-center py-16">
-          <p className="text-xl text-gray-600 mb-4">No bookings yet</p>
-          
-           <a href="/hotels"
-            className="text-primary font-bold hover:underline"
-          >
-            Start exploring and book your first trip! →
-          </a>
-        </div>
+        </section>
       )}
     </div>
   );
 }
-
-export default MyBookings

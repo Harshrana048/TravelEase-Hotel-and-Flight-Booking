@@ -75,13 +75,13 @@ exports.createOrder = async (req, res) => {
             orderId: { $ne: null }
         });
 
-        if (pendingPayment) {
-            return res.status(400).json({
-                message: 'A payment order already exists for this booking. Complete or cancel it first.',
-                orderId: pendingPayment.orderId,
-                paymentId: pendingPayment._id
-            });
-        }
+        // if (pendingPayment) {
+        //     return res.status(400).json({
+        //         message: 'A payment order already exists for this booking. Complete or cancel it first.',
+        //         orderId: pendingPayment.orderId,
+        //         paymentId: pendingPayment._id
+        //     });
+        // }
 
         const razorpayOrder = await razorpay.orders.create({
             amount: actualAmount * 100,
@@ -449,6 +449,22 @@ exports.cancelAndRefund = async (req, res) => {
             });
         }
 
+        let booking;
+
+if (payment.bookingType === "HotelBooking") {
+    booking = await HotelBooking.findById(payment.bookingId);
+    if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // Hotel stay has already started or passed
+    if (new Date() >= new Date(booking.checkInDate)) {
+        return res.status(400).json({
+            message: "This hotel booking can no longer be cancelled because the check-in date has already passed."
+        });
+    }
+
+} 
         payment.paymentStatus = 'refund_pending';
         payment.errorMessage = '';
         await payment.save();
@@ -466,7 +482,6 @@ exports.cancelAndRefund = async (req, res) => {
       <p><strong>Refund Details:</strong></p>
       <ul>
         <li>Refund Amount: ₹${refundAmount}</li>
-        <li>Type: ${isFullRefund ? 'Full' : 'Partial'}</li>
         <li>Status: Processing</li>
       </ul>
       <p>You will receive another email once the refund is complete.</p>
@@ -497,7 +512,7 @@ exports.cancelAndRefund = async (req, res) => {
                 const user = await User.findById(req.user._id);
                 await sendEmail({
                     to: user.email,
-                    subject: `${isFullRefund ? 'Full' : 'Partial'} Refund Completed - TravelEase`,
+                    subject: `'Full'  Refund Completed - TravelEase`,
                     html: `
       <h2>✅ Refund Completed</h2>
       <p>Dear ${user.name},</p>
@@ -506,7 +521,7 @@ exports.cancelAndRefund = async (req, res) => {
       <ul>
         <li>Refund ID: ${razorpayRefund.id}</li>
         <li>Amount Refunded: ₹${refundAmount}</li>
-        <li>Type: ${isFullRefund ? 'Full' : 'Partial'}</li>
+      
         <li>Processed On: ${new Date().toLocaleString()}</li>
       </ul>
       <p>The refund will be credited to your original payment method within 3-5 business days.</p>
