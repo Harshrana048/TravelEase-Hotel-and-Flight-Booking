@@ -330,72 +330,72 @@ exports.verifyPayment = async (req, res) => {
     }
 
     // Send email
-    // try {
-    //   const user = await User.findById(req.user._id);
+    try {
+      const user = await User.findById(req.user._id);
 
-    //   if (payment.bookingType === 'HotelBooking') {
-    //     const pdfBuffer = await generateHotelTicketPDF(booking, booking.hotelId);
-    //     await sendEmail({
-    //       to: user.email,
-    //       subject: `Hotel Booking Confirmed - Payment Received`,
-    //       html: `
-    //         <h2>🏨 Booking Confirmed & Payment Received!</h2>
-    //         <p>Dear ${user.name},</p>
-    //         <p>Your payment has been successfully received. Your hotel booking is now confirmed.</p>
-    //         <p><strong>Booking Details:</strong></p>
-    //         <ul>
-    //           <li>Hotel: ${booking.hotelId.name}, ${booking.hotelId.city}</li>
-    //           <li>Check-in: ${new Date(booking.checkInDate).toDateString()}</li>
-    //           <li>Check-out: ${new Date(booking.checkOutDate).toDateString()}</li>
-    //           <li>Number of Nights: ${booking.nights}</li>
-    //           <li>Total Amount: ₹${booking.totalPrice}</li>
-    //         </ul>
-    //         <p>Your booking confirmation PDF is attached.</p>
-    //         <p>Thank you for using TravelEase!</p>
-    //       `,
-    //       attachments: [
-    //         {
-    //           filename: `hotel-booking-${booking._id}.pdf`,
-    //           content: pdfBuffer,
-    //         },
-    //       ],
-    //     });
-    //   } else if (payment.bookingType === 'FlightBooking') {
-    //     const pdfBuffer = await generateFlightTicketPDF(
-    //       booking,
-    //       booking.flightId,
-    //       booking.returnFlightId
-    //     );
-    //     await sendEmail({
-    //       to: user.email,
-    //       subject: `Flight Booking Confirmed - Payment Received`,
-    //       html: `
-    //         <h2>✈️ Booking Confirmed & Payment Received!</h2>
-    //         <p>Dear ${user.name},</p>
-    //         <p>Your payment has been successfully received. Your flight booking is now confirmed.</p>
-    //         <p><strong>Flight Details:</strong></p>
-    //         <ul>
-    //           <li>Flight: ${booking.flightId.flightNumber} (${booking.flightId.airline})</li>
-    //           <li>Route: ${booking.flightId.source} → ${booking.flightId.destination}</li>
-    //           <li>Departure: ${new Date(booking.flightId.departureTime).toLocaleString()}</li>
-    //           <li>Passengers: ${booking.passengers.length}</li>
-    //           <li>Total Amount: ₹${booking.totalPrice}</li>
-    //         </ul>
-    //         <p>Your booking confirmation PDF is attached.</p>
-    //         <p>Thank you for using TravelEase!</p>
-    //       `,
-    //       attachments: [
-    //         {
-    //           filename: `flight-booking-${booking._id}.pdf`,
-    //           content: pdfBuffer,
-    //         },
-    //       ],
-    //     });
-    //   }
-    // } catch (emailErr) {
-    //   console.error('⚠️ Email Failed:', emailErr.message);
-    //   // Don't fail payment if email fails
-    // }
+      if (payment.bookingType === 'HotelBooking') {
+        const pdfBuffer = await generateHotelTicketPDF(booking, booking.hotelId);
+        await sendEmail({
+          to: user.email,
+          subject: `Hotel Booking Confirmed - Payment Received`,
+          html: `
+            <h2>🏨 Booking Confirmed & Payment Received!</h2>
+            <p>Dear ${user.name},</p>
+            <p>Your payment has been successfully received. Your hotel booking is now confirmed.</p>
+            <p><strong>Booking Details:</strong></p>
+            <ul>
+              <li>Hotel: ${booking.hotelId.name}, ${booking.hotelId.city}</li>
+              <li>Check-in: ${new Date(booking.checkInDate).toDateString()}</li>
+              <li>Check-out: ${new Date(booking.checkOutDate).toDateString()}</li>
+              <li>Number of Nights: ${booking.nights}</li>
+              <li>Total Amount: ₹${booking.totalPrice}</li>
+            </ul>
+            <p>Your booking confirmation PDF is attached.</p>
+            <p>Thank you for using TravelEase!</p>
+          `,
+          attachments: [
+            {
+              filename: `hotel-booking-${booking._id}.pdf`,
+              content: pdfBuffer,
+            },
+          ],
+        });
+      } else if (payment.bookingType === 'FlightBooking') {
+        const pdfBuffer = await generateFlightTicketPDF(
+          booking,
+          booking.flightId,
+          booking.returnFlightId
+        );
+        await sendEmail({
+          to: user.email,
+          subject: `Flight Booking Confirmed - Payment Received`,
+          html: `
+            <h2>✈️ Booking Confirmed & Payment Received!</h2>
+            <p>Dear ${user.name},</p>
+            <p>Your payment has been successfully received. Your flight booking is now confirmed.</p>
+            <p><strong>Flight Details:</strong></p>
+            <ul>
+              <li>Flight: ${booking.flightId.flightNumber} (${booking.flightId.airline})</li>
+              <li>Route: ${booking.flightId.source} → ${booking.flightId.destination}</li>
+              <li>Departure: ${new Date(booking.flightId.departureTime).toLocaleString()}</li>
+              <li>Passengers: ${booking.passengers.length}</li>
+              <li>Total Amount: ₹${booking.totalPrice}</li>
+            </ul>
+            <p>Your booking confirmation PDF is attached.</p>
+            <p>Thank you for using TravelEase!</p>
+          `,
+          attachments: [
+            {
+              filename: `flight-booking-${booking._id}.pdf`,
+              content: pdfBuffer,
+            },
+          ],
+        });
+      }
+    } catch (emailErr) {
+      console.error('⚠️ Email Failed:', emailErr.message);
+      // Don't fail payment if email fails
+    }
 
     res.json({
       message: 'Payment verified successfully',

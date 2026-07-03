@@ -1,6 +1,7 @@
 
 // External module
 const jwt = require('jsonwebtoken');
+const {OAuth2Client} = require('google-auth-library')
 // Local module
 const User = require('../models/User.model');
 const HotelBooking = require('../models/HotelBooking.model');
@@ -8,11 +9,65 @@ const FlightBooking = require('../models/FlightBooking.model');
 const Hotel = require('../models/hotel.model');
 const Flight = require('../models/Flight.model');
 
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+
+
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 }
+
+exports.googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential)
+      return res.status(400).json({ message: 'Google credential missing' });
+
+    // Verify the ID token with Google
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const {email,name,sub} = ticket.getPayload();
+    
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if(user && !user.googleId){
+      user.googleId = sub;
+      await user.save()
+    }
+
+    if (!user ) {
+      // Create new user (no password needed)
+      user = await User.create({
+        name,
+        email,
+        googleId: sub,
+       
+      });
+    } 
+
+    const token = signToken(user._id);
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+       
+      },
+    });
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid Google token', error: err.message });
+  }
+};
 
 exports.register = async (req, res) => {
   try {

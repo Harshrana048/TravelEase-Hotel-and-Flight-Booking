@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { Navbar, Footer, ProtectedRoute } from "./components/index";
+import { Navbar, Footer, ProtectedRoute,NotFound} from "./components/index";
 import {
   Home,
   Login,
@@ -103,6 +103,7 @@ function AppContent() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/cookies-policy" element={<CookiesPolicy />} />
           <Route path="/legal-disclaimer" element={<LegalDisclaimer />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

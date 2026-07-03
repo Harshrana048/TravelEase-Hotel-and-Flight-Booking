@@ -21,12 +21,12 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Password is required'],
+        required: [function() {return !this.googleId;}, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters'],
     },
     phone: {
         type: String,
-        required: [true, 'Phone number is required'],
+        required: [function() {return !this.googleId;}, 'Phone number is required'],
         trim: true,
         match: [
         /^\d{10}$/,
@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user',
     },
+    googleId: {type:String,default: ''},
     wishlist: {
     hotels:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' }],
     flights: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flight' }],
@@ -45,13 +46,14 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 userSchema.pre('save',async function(){
-    if(!this.isModified('password')) return ;
+    if(!this.isModified('password') || !this.password) return ;
     this.password = await bcrypt.hash(this.password,10);
     
     
 });
 
 userSchema.methods.comparePassword = function(candiate){
+    if(!this.password) return Promise.resolve(false);
     return bcrypt.compare(candiate,this.password);
 }
 
