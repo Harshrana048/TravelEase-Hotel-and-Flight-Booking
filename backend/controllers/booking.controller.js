@@ -257,7 +257,7 @@ exports.cancelBookings = async (req, res) => {
 
         const Model = type === 'hotel' ? HotelBooking : FlightBooking;
 
-        const booking = await Model.findOne({ _id: id, userId: req.user._id });
+        let booking = await Model.findOne({ _id: id, userId: req.user._id }); // ✅ BUG FIX: was const (reassigned below)
         if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
         if (booking.bookingStatus === 'cancelled') {
@@ -279,21 +279,31 @@ exports.cancelBookings = async (req, res) => {
 
                 console.log(`🏨 Restored ${booking.roomsBooked} rooms for hotel ${hotel._id}`);
 
-                // ✅ Get updated hotel for socket event
+                // ── Step 3: Room Validation before emit ─────────────────────────────────
+                const cancelHotelRoomName = `hotel-${hotel._id}`;
+                const cancelHotelRoom = io.sockets.adapter.rooms.get(cancelHotelRoomName);
+                const cancelHotelClients = cancelHotelRoom ? [...cancelHotelRoom] : [];
+                console.log(`\n[SOCKET] 🔍 STEP 3 — Room Validation (cancel, before emit)`);
+                console.log(`   Room name     : ${cancelHotelRoomName}`);
+                console.log(`   Clients count : ${cancelHotelRoom ? cancelHotelRoom.size : 0}`);
+                if (!cancelHotelRoom) console.log(`   ⚠️  Room empty — no browser watching this hotel page`);
+
+                // Get updated hotel for socket event
                 const updatedHotel = await Hotel.findById(hotel._id);
 
-                // ✅ EMIT SOCKET EVENT
-                io.to(`hotel-${hotel._id}`).emit('room-cancelled', {
+                // ── Step 4: Event Emission ────────────────────────────────────────────
+                const cancelHotelPayload = {
                     hotelId: hotel._id.toString(),
                     roomsAvailable: updatedHotel.roomsAvailable,
                     message: `${booking.roomsBooked} room(s) released. ${updatedHotel.roomsAvailable} now available.`,
-                });
-
-                console.log(`📡 Emitted room-cancelled for hotel ${hotel._id}`);
-                console.log('📣 Payload:', {
-                    hotelId: hotel._id.toString(),
-                    roomsAvailable: updatedHotel.roomsAvailable,
-                });
+                };
+                io.to(cancelHotelRoomName).emit('room-cancelled', cancelHotelPayload);
+                console.log(`\n[SOCKET] 📡 STEP 4 — Emitting room-cancelled`);
+                console.log(`   Event name    : room-cancelled`);
+                console.log(`   Room name     : ${cancelHotelRoomName}`);
+                console.log(`   Payload       :`, JSON.stringify(cancelHotelPayload, null, 6));
+                console.log(`   Clients receiving: ${cancelHotelRoom ? cancelHotelRoom.size : 0}`);
+                console.log('');
             }
         } else {
             // ✅ Restore flight seats only if booking was confirmed

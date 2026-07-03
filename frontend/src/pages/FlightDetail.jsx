@@ -10,6 +10,7 @@ import {
   onFlightBooked,
   onFlightCancelled,
   offFlightBooked,
+  offFlightCancelled,
 } from "../services/socket";
 
 const calculateDuration = (departure, arrival) => {
@@ -89,39 +90,66 @@ function FlightDetail() {
     dispatch(getFlightById(id));
   }, [id, dispatch]);
 
-   // ✅ Socket setup
+   // ✅ Socket setup — with debug instrumentation
   useEffect(() => {
+    console.group('%c[FlightDetail] STEP 2 — Socket useEffect fired', 'color:#8b5cf6;font-weight:bold');
+    console.log('currentFlight._id :', currentFlight?._id);
+    console.log('currentFlight._id truthy?', !!currentFlight?._id);
+    console.groupEnd();
+
     const socket = initSocket();
 
     if (currentFlight?._id) {
+      // ── Step 2: Room Join ────────────────────────────────────────────
       joinFlight(currentFlight._id);
 
-      // Listen for flight bookings
+      // ── Step 5: Frontend Listeners ──────────────────────────────────
       onFlightBooked((data) => {
-        console.log('✈️ Flight booked event:', data);
+        console.group('%c[FlightDetail] STEP 6 — React State: flight-booked', 'color:#10b981;font-weight:bold');
+        console.log('Previous availableSeats :', availableSeats);
+        console.log('↓ Updating to           :', data.availableSeats);
+        console.log('UI driven by local state, NOT Redux currentFlight ✅');
+        console.groupEnd();
         setAvailableSeats(data.availableSeats);
         toast.success(data.message);
       });
 
       // Listen for flight cancellations
       onFlightCancelled((data) => {
-        console.log('✈️ Flight cancelled event:', data);
+        console.group('%c[FlightDetail] STEP 6 — React State: flight-cancelled', 'color:#f59e0b;font-weight:bold');
+        console.log('Previous availableSeats :', availableSeats);
+        console.log('↓ Updating to           :', data.availableSeats);
+        console.log('UI driven by local state, NOT Redux currentFlight ✅');
+        console.groupEnd();
         setAvailableSeats(data.availableSeats);
         toast.info(data.message);
       });
+    } else {
+      console.warn('[FlightDetail] ⚠️  currentFlight._id not available yet — socket join deferred');
     }
 
+    // ── Step 8: Cleanup ─────────────────────────────────────────────────
     return () => {
       if (currentFlight?._id) {
+        console.group('%c[FlightDetail] STEP 8 — Cleanup (component unmounting or flight changed)', 'color:#f59e0b;font-weight:bold');
+        console.log('Leaving flight room for ID:', currentFlight._id);
         leaveFlight(currentFlight._id);
         offFlightBooked();
+        offFlightCancelled(); // ✅ BUG FIX: was missing
+        console.log('All flight listeners removed ✅');
+        console.groupEnd();
       }
     };
   }, [currentFlight?._id]);
 
-  // Update local state when flight loads
+  // ── Step 6: Seed local state from Redux on initial load ────────────────────
   useEffect(() => {
     if (currentFlight?.availableSeats !== undefined) {
+      console.log(
+        '[FlightDetail] STEP 6 — Seeding availableSeats from Redux:',
+        currentFlight.availableSeats,
+        '(initial load only — real-time updates come from socket)'
+      );
       setAvailableSeats(currentFlight.availableSeats);
     }
   }, [currentFlight?.availableSeats]);

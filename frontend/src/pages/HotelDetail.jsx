@@ -77,39 +77,65 @@ export default function HotelDetail() {
     dispatch(getHotelById(id));
   }, [dispatch, id]);
 
-  // ✅ Socket setup
+  // ✅ Socket setup — with debug instrumentation
   useEffect(() => {
+    console.group('%c[HotelDetail] STEP 2 — Socket useEffect fired', 'color:#3b82f6;font-weight:bold');
+    console.log('currentHotel._id :', currentHotel?._id);
+    console.log('currentHotel._id truthy?', !!currentHotel?._id);
+    console.groupEnd();
+
     const socket = initSocket();
 
     if (currentHotel?._id) {
+      // ── Step 2: Room Join ────────────────────────────────────────────
       joinHotel(currentHotel._id);
 
-      // Listen for room bookings
+      // ── Step 5: Frontend Listeners ──────────────────────────────────
       onRoomBooked((data) => {
-        console.log("🏨 Room booked event:", data);
+        console.group('%c[HotelDetail] STEP 6 — React State: room-booked', 'color:#10b981;font-weight:bold');
+        console.log('Previous roomsAvailable :', roomsAvailable);
+        console.log('↓ Updating to           :', data.roomsAvailable);
+        console.log('UI driven by local state, NOT Redux currentHotel ✅');
+        console.groupEnd();
         setRoomsAvailable(data.roomsAvailable);
         toast.success(data.message);
       });
 
-      // Listen for room cancellations
       onRoomCancelled((data) => {
-        console.log("🏨 Room cancelled event:", data);
+        console.group('%c[HotelDetail] STEP 6 — React State: room-cancelled', 'color:#f59e0b;font-weight:bold');
+        console.log('Previous roomsAvailable :', roomsAvailable);
+        console.log('↓ Updating to           :', data.roomsAvailable);
+        console.log('UI driven by local state, NOT Redux currentHotel ✅');
+        console.groupEnd();
         setRoomsAvailable(data.roomsAvailable);
         toast.info(data.message);
       });
+    } else {
+      console.warn('[HotelDetail] ⚠️  currentHotel._id not available yet — socket join deferred');
     }
 
+    // ── Step 8: Cleanup ─────────────────────────────────────────────────
     return () => {
       if (currentHotel?._id) {
+        console.group('%c[HotelDetail] STEP 8 — Cleanup (component unmounting or hotel changed)', 'color:#f59e0b;font-weight:bold');
+        console.log('Leaving hotel room for ID:', currentHotel._id);
         leaveHotel(currentHotel._id);
         offRoomBooked();
+        offRoomCancelled(); // ✅ BUG FIX: was missing
+        console.log('All hotel listeners removed ✅');
+        console.groupEnd();
       }
     };
   }, [currentHotel?._id]);
 
-  // Update local state when hotel loads
+  // ── Step 6: Seed local state from Redux on initial load ────────────────────
   useEffect(() => {
-    if (currentHotel?.roomsAvailable) {
+    if (currentHotel?.roomsAvailable !== undefined) {
+      console.log(
+        '[HotelDetail] STEP 6 — Seeding roomsAvailable from Redux:',
+        currentHotel.roomsAvailable,
+        '(initial load only — real-time updates come from socket)'
+      );
       setRoomsAvailable(currentHotel.roomsAvailable);
     }
   }, [currentHotel?.roomsAvailable]);

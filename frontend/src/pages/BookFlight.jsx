@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -24,7 +24,7 @@ const calcDuration = (dep, arr) => {
   return `${h}h ${m}m`;
 };
 
-/* ─── Progress Stepper ───────────────────────────────────────────── */
+
 
 
 
@@ -50,7 +50,8 @@ export default function BookFlight() {
   const { loading: bookingLoading } = useSelector((state) => state.booking);
   const { user } = useSelector((state) => state.auth);
 
-  /* ── State (all original) ── */
+ ;
+
   const [formData, setFormData] = useState({
     passengers: [{ name: "", phone: "", age: "" }],
     tripType: "one-way",
@@ -114,6 +115,9 @@ export default function BookFlight() {
 
   /* ── Original handleSubmit logic, now called from review modal ── */
  const handleProceedToPayment = async () => {
+ 
+   
+
   try {
     // 1. Initiate a Pending Reference Booking (Locks the seat on the backend)
     const result = await dispatch(
@@ -185,6 +189,7 @@ export default function BookFlight() {
   } catch (err) {
     const errorMsg = typeof err === "string" ? err : err?.message || "Failed to initiate booking";
     toast.error(errorMsg);
+     isProcessing.current = false; 
   }
 };
 
