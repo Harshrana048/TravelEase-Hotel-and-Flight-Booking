@@ -79,10 +79,7 @@ export default function HotelDetail() {
 
   // ✅ Socket setup — with debug instrumentation
   useEffect(() => {
-    console.group('%c[HotelDetail] STEP 2 — Socket useEffect fired', 'color:#3b82f6;font-weight:bold');
-    console.log('currentHotel._id :', currentHotel?._id);
-    console.log('currentHotel._id truthy?', !!currentHotel?._id);
-    console.groupEnd();
+    
 
     const socket = initSocket();
 
@@ -92,21 +89,12 @@ export default function HotelDetail() {
 
       // ── Step 5: Frontend Listeners ──────────────────────────────────
       onRoomBooked((data) => {
-        console.group('%c[HotelDetail] STEP 6 — React State: room-booked', 'color:#10b981;font-weight:bold');
-        console.log('Previous roomsAvailable :', roomsAvailable);
-        console.log('↓ Updating to           :', data.roomsAvailable);
-        console.log('UI driven by local state, NOT Redux currentHotel ✅');
-        console.groupEnd();
+       
         setRoomsAvailable(data.roomsAvailable);
         toast.success(data.message);
       });
 
       onRoomCancelled((data) => {
-        console.group('%c[HotelDetail] STEP 6 — React State: room-cancelled', 'color:#f59e0b;font-weight:bold');
-        console.log('Previous roomsAvailable :', roomsAvailable);
-        console.log('↓ Updating to           :', data.roomsAvailable);
-        console.log('UI driven by local state, NOT Redux currentHotel ✅');
-        console.groupEnd();
         setRoomsAvailable(data.roomsAvailable);
         toast.info(data.message);
       });
@@ -117,12 +105,11 @@ export default function HotelDetail() {
     // ── Step 8: Cleanup ─────────────────────────────────────────────────
     return () => {
       if (currentHotel?._id) {
-        console.group('%c[HotelDetail] STEP 8 — Cleanup (component unmounting or hotel changed)', 'color:#f59e0b;font-weight:bold');
-        console.log('Leaving hotel room for ID:', currentHotel._id);
+        
         leaveHotel(currentHotel._id);
         offRoomBooked();
         offRoomCancelled(); // ✅ BUG FIX: was missing
-        console.log('All hotel listeners removed ✅');
+        
         console.groupEnd();
       }
     };

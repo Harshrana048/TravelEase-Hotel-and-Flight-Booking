@@ -281,12 +281,7 @@ exports.cancelBookings = async (req, res) => {
 
                 // ── Step 3: Room Validation before emit ─────────────────────────────────
                 const cancelHotelRoomName = `hotel-${hotel._id}`;
-                const cancelHotelRoom = io.sockets.adapter.rooms.get(cancelHotelRoomName);
-                const cancelHotelClients = cancelHotelRoom ? [...cancelHotelRoom] : [];
-                console.log(`\n[SOCKET] 🔍 STEP 3 — Room Validation (cancel, before emit)`);
-                console.log(`   Room name     : ${cancelHotelRoomName}`);
-                console.log(`   Clients count : ${cancelHotelRoom ? cancelHotelRoom.size : 0}`);
-                if (!cancelHotelRoom) console.log(`   ⚠️  Room empty — no browser watching this hotel page`);
+            
 
                 // Get updated hotel for socket event
                 const updatedHotel = await Hotel.findById(hotel._id);
@@ -298,12 +293,7 @@ exports.cancelBookings = async (req, res) => {
                     message: `${booking.roomsBooked} room(s) released. ${updatedHotel.roomsAvailable} now available.`,
                 };
                 io.to(cancelHotelRoomName).emit('room-cancelled', cancelHotelPayload);
-                console.log(`\n[SOCKET] 📡 STEP 4 — Emitting room-cancelled`);
-                console.log(`   Event name    : room-cancelled`);
-                console.log(`   Room name     : ${cancelHotelRoomName}`);
-                console.log(`   Payload       :`, JSON.stringify(cancelHotelPayload, null, 6));
-                console.log(`   Clients receiving: ${cancelHotelRoom ? cancelHotelRoom.size : 0}`);
-                console.log('');
+               
             }
         } else {
             // ✅ Restore flight seats only if booking was confirmed
@@ -329,11 +319,7 @@ exports.cancelBookings = async (req, res) => {
                     message: `${booking.passengerCount} seat(s) released. ${updatedFlight.availableSeats} now available.`,
                 });
 
-                console.log(`📡 Emitted flight-cancelled for flight ${flight._id}`);
-                console.log('📣 Payload:', {
-                    flightId: flight._id.toString(),
-                    availableSeats: updatedFlight.availableSeats,
-                });
+                
 
                 // ✅ Restore return flight if round-trip
                 if (booking.tripType === 'round-trip' && returnFlight) {
@@ -341,7 +327,7 @@ exports.cancelBookings = async (req, res) => {
                         $inc: { availableSeats: booking.passengerCount },
                     });
 
-                    console.log(`✈️ Restored ${booking.passengerCount} seats for return flight ${returnFlight._id}`);
+                   
 
                     // ✅ Get updated return flight
                     const updatedReturnFlight = await Flight.findById(returnFlight._id);
@@ -353,11 +339,7 @@ exports.cancelBookings = async (req, res) => {
                         message: `${booking.passengerCount} seat(s) released (return). ${updatedReturnFlight.availableSeats} now available.`,
                     });
 
-                    console.log(`📡 Emitted flight-cancelled for return flight ${returnFlight._id}`);
-                    console.log('📣 Payload:', {
-                        flightId: returnFlight._id.toString(),
-                        availableSeats: updatedReturnFlight.availableSeats,
-                    });
+            
                 }
             }
         }

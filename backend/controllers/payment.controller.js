@@ -216,23 +216,7 @@ exports.verifyPayment = async (req, res) => {
 
       // ── Step 3: Room Validation before emit ─────────────────────────────────
       const hotelRoomName = `hotel-${hotelId}`;
-      const hotelRoom = io.sockets.adapter.rooms.get(hotelRoomName);
-      const hotelRoomClients = hotelRoom ? [...hotelRoom] : [];
-      console.log(`\n[SOCKET] 🔍 STEP 3 — Room Validation (before emit)`);
-      console.log(`   Room name     : ${hotelRoomName}`);
-      if (hotelRoom) {
-          console.log(`   Clients count : ${hotelRoom.size}`);
-          console.log(`   Socket IDs    :`, hotelRoomClients);
-      } else {
-          console.log(`   ⚠️  Room is EMPTY/UNDEFINED — no browsers watching this hotel page!`);
-          console.log(`   → The event will be emitted but nobody will receive it.`);
-          console.log(`   → Possible causes:`);
-          console.log(`       1. Browser A never opened /hotels/${hotelId}`);
-          console.log(`       2. Browser A opened the page but socket never joined the room`);
-          console.log(`       3. Browser A refreshed before payment completed`);
-      }
-
-      // ── Step 4: Event Emission ────────────────────────────────────────────
+         // ── Step 4: Event Emission ────────────────────────────────────────────
       const updatedHotel = await Hotel.findById(hotelId);
       const hotelPayload = {
           hotelId: hotelId.toString(),
@@ -240,13 +224,7 @@ exports.verifyPayment = async (req, res) => {
           message: `${roomsBooked} room(s) booked. ${updatedHotel.roomsAvailable} remaining.`,
       };
       io.to(hotelRoomName).emit('room-booked', hotelPayload);
-      console.log(`\n[SOCKET] 📡 STEP 4 — Emitting room-booked`);
-      console.log(`   Event name    : room-booked`);
-      console.log(`   Room name     : ${hotelRoomName}`);
-      console.log(`   Payload       :`, JSON.stringify(hotelPayload, null, 6));
-      console.log(`   Clients receiving: ${hotelRoom ? hotelRoom.size : 0}`);
-      console.log('');
-
+      
     } else if (payment.bookingType === 'FlightBooking') {
       // ✅ FIXED: Added 'else if' condition
       const pendingBooking = await FlightBooking.findById(payment.bookingId);
@@ -326,21 +304,7 @@ exports.verifyPayment = async (req, res) => {
 
       // ── Step 3: Room Validation before emit (main flight) ────────────────
       const flightRoomName = `flight-${flightId}`;
-      const flightRoom = io.sockets.adapter.rooms.get(flightRoomName);
-      const flightRoomClients = flightRoom ? [...flightRoom] : [];
-      console.log(`\n[SOCKET] 🔍 STEP 3 — Room Validation (before emit)`);
-      console.log(`   Room name     : ${flightRoomName}`);
-      if (flightRoom) {
-          console.log(`   Clients count : ${flightRoom.size}`);
-          console.log(`   Socket IDs    :`, flightRoomClients);
-      } else {
-          console.log(`   ⚠️  Room is EMPTY/UNDEFINED — no browsers watching this flight page!`);
-          console.log(`   → The event will be emitted but nobody will receive it.`);
-          console.log(`   → Possible causes:`);
-          console.log(`       1. Browser A never opened /flights/${flightId}`);
-          console.log(`       2. Browser A opened the page but socket join was not sent`);
-          console.log(`       3. Browser A refreshed before payment completed`);
-      }
+     
 
       // ── Step 4: Event Emission (main flight) ───────────────────────────
       const updatedFlight = await Flight.findById(flightId);
@@ -350,12 +314,7 @@ exports.verifyPayment = async (req, res) => {
           message: `${passengerCount} seat(s) booked. ${updatedFlight.availableSeats} remaining.`,
       };
       io.to(flightRoomName).emit('flight-booked', flightPayload);
-      console.log(`\n[SOCKET] 📡 STEP 4 — Emitting flight-booked`);
-      console.log(`   Event name    : flight-booked`);
-      console.log(`   Room name     : ${flightRoomName}`);
-      console.log(`   Payload       :`, JSON.stringify(flightPayload, null, 6));
-      console.log(`   Clients receiving: ${flightRoom ? flightRoom.size : 0}`);
-      console.log('');
+      
 
       // ✅ EMIT SOCKET EVENT FOR RETURN FLIGHT
       if (tripType === 'round-trip' && returnFlightId) {
@@ -366,11 +325,7 @@ exports.verifyPayment = async (req, res) => {
           message: `${passengerCount} seat(s) booked (return). ${updatedReturnFlight.availableSeats} remaining.`,
         });
 
-        console.log(`✈️ Emitted flight-booked for return flight ${returnFlightId}`);
-        console.log('📣 Payload:', {
-          flightId: returnFlightId.toString(),
-          availableSeats: updatedReturnFlight.availableSeats,
-        });
+       
       }
     }
 
