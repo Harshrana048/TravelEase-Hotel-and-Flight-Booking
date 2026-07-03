@@ -77,7 +77,7 @@ export default function ProfileCard({ compact = false }) {
               <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">
                 {label}
               </p>
-              <p className="mt-2 break-words text-sm font-bold text-slate-800">
+              <p className="mt-2 wrap-break-word text-sm font-bold text-slate-800">
                 {value}
               </p>
             </div>

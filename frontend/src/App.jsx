@@ -29,7 +29,9 @@ import {
 function AppContent() {
   const location = useLocation();
   const showShell =
-    location.pathname !== "/login" && location.pathname !== "/register";
+    location.pathname !== "/login" &&
+    location.pathname !== "/register" &&
+    location.pathname !== "/admin";
 
   return (
     <div className="min-h-screen flex flex-col">

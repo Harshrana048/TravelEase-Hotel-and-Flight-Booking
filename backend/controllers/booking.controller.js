@@ -3,8 +3,8 @@ const FlightBooking = require('../models/FlightBooking.model');
 const Hotel = require('../models/hotel.model');
 const Flight = require('../models/Flight.model');
 const {
-  generateHotelTicketPDF,
-  generateFlightTicketPDF,
+    generateHotelTicketPDF,
+    generateFlightTicketPDF,
 } = require("../utils/generatePDF");
 
 exports.bookHotel = async (req, res) => {
@@ -55,7 +55,7 @@ exports.bookHotel = async (req, res) => {
             });
         }
 
-         const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
         const totalPrice = nights * hotel.pricePerNight * roomsBooked;
 
         // create Booking
@@ -71,7 +71,7 @@ exports.bookHotel = async (req, res) => {
             checkOutDate: checkOut,
             nights,
             totalPrice,
-            bookingStatus: 'pending',      
+            bookingStatus: 'pending',
             paymentStatus: 'pending',
 
         });
@@ -132,7 +132,7 @@ exports.bookFlight = async (req, res) => {
             : flight.price * passengerCount;
 
         // Generate seat numbers for each passenger
-       
+
 
         const booking = await FlightBooking.create({
             userId: req.user._id,
@@ -141,13 +141,13 @@ exports.bookFlight = async (req, res) => {
             passengerCount,
             seatNumbers: "",
             totalPrice,
-            bookingStatus: 'pending',      
+            bookingStatus: 'pending',
             paymentStatus: 'pending',
             tripType: tripType || 'one-way',
             returnFlightId: tripType === 'round-trip' ? returnFlightId : null,
         });
 
-       
+
         res.status(201).json(booking);
 
 
@@ -176,74 +176,74 @@ exports.getMyBookings = async (req, res) => {
     }
 }
 exports.downloadTicket = async (req, res) => {
-  try {
-    const { bookingId } = req.params;
-    const { type } = req.query;
+    try {
+        const { bookingId } = req.params;
+        const { type } = req.query;
 
-    if (type === "HotelBooking") {
-      const booking = await HotelBooking.findById(bookingId);
+        if (type === "HotelBooking") {
+            const booking = await HotelBooking.findById(bookingId);
 
-      if (!booking) {
-        return res.status(404).json({
-          message: "Booking not found",
+            if (!booking) {
+                return res.status(404).json({
+                    message: "Booking not found",
+                });
+            }
+
+            const hotel = await Hotel.findById(booking.hotelId);
+
+            const pdfBuffer = await generateHotelTicketPDF(booking, hotel);
+
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader(
+                "Content-Disposition",
+                `attachment; filename=hotel-ticket-${booking._id}.pdf`
+            );
+
+            return res.send(pdfBuffer);
+        }
+
+        if (type === "FlightBooking") {
+            const booking = await FlightBooking.findById(bookingId);
+
+            if (!booking) {
+                return res.status(404).json({
+                    message: "Booking not found",
+                });
+            }
+
+            const flight = await Flight.findById(booking.flightId);
+
+            let returnFlight = null;
+
+            if (booking.returnFlightId) {
+                returnFlight = await Flight.findById(
+                    booking.returnFlightId
+                );
+            }
+
+            const pdfBuffer = await generateFlightTicketPDF(
+                booking,
+                flight,
+                returnFlight
+            );
+
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader(
+                "Content-Disposition",
+                `attachment; filename=flight-ticket-${booking._id}.pdf`
+            );
+
+            return res.send(pdfBuffer);
+        }
+
+        return res.status(400).json({
+            message: "Invalid booking type",
         });
-      }
-
-      const hotel = await Hotel.findById(booking.hotelId);
-
-      const pdfBuffer = await generateHotelTicketPDF(booking, hotel);
-
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename=hotel-ticket-${booking._id}.pdf`
-      );
-
-      return res.send(pdfBuffer);
-    }
-
-    if (type === "FlightBooking") {
-      const booking = await FlightBooking.findById(bookingId);
-
-      if (!booking) {
-        return res.status(404).json({
-          message: "Booking not found",
+    } catch (err) {
+        res.status(500).json({
+            message: err.message,
         });
-      }
-
-      const flight = await Flight.findById(booking.flightId);
-
-      let returnFlight = null;
-
-      if (booking.returnFlightId) {
-        returnFlight = await Flight.findById(
-          booking.returnFlightId
-        );
-      }
-
-      const pdfBuffer = await generateFlightTicketPDF(
-        booking,
-        flight,
-        returnFlight
-      );
-
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename=flight-ticket-${booking._id}.pdf`
-      );
-
-      return res.send(pdfBuffer);
     }
-
-    return res.status(400).json({
-      message: "Invalid booking type",
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
-  }
 };
 
 exports.cancelBookings = async (req, res) => {
@@ -264,6 +264,94 @@ exports.cancelBookings = async (req, res) => {
             return res.status(400).json({ message: 'Booking is already cancelled' });
         }
 
+        const io = req.app.get('io');
+
+        if (type === 'hotel') {
+            // ✅ Restore hotel rooms only if booking was confirmed
+            if (booking.paymentStatus === 'paid') {
+                booking = await booking.populate('hotelId');
+                const hotel = booking.hotelId;
+
+                // Restore rooms
+                await Hotel.findByIdAndUpdate(hotel._id, {
+                    $inc: { roomsAvailable: booking.roomsBooked },
+                });
+
+                console.log(`🏨 Restored ${booking.roomsBooked} rooms for hotel ${hotel._id}`);
+
+                // ✅ Get updated hotel for socket event
+                const updatedHotel = await Hotel.findById(hotel._id);
+
+                // ✅ EMIT SOCKET EVENT
+                io.to(`hotel-${hotel._id}`).emit('room-cancelled', {
+                    hotelId: hotel._id.toString(),
+                    roomsAvailable: updatedHotel.roomsAvailable,
+                    message: `${booking.roomsBooked} room(s) released. ${updatedHotel.roomsAvailable} now available.`,
+                });
+
+                console.log(`📡 Emitted room-cancelled for hotel ${hotel._id}`);
+                console.log('📣 Payload:', {
+                    hotelId: hotel._id.toString(),
+                    roomsAvailable: updatedHotel.roomsAvailable,
+                });
+            }
+        } else {
+            // ✅ Restore flight seats only if booking was confirmed
+            if (booking.paymentStatus === 'paid') {
+                booking = await booking.populate('flightId').populate('returnFlightId');
+                const flight = booking.flightId;
+                const returnFlight = booking.returnFlightId;
+
+                // Restore main flight seats
+                await Flight.findByIdAndUpdate(flight._id, {
+                    $inc: { availableSeats: booking.passengerCount },
+                });
+
+                console.log(`✈️ Restored ${booking.passengerCount} seats for flight ${flight._id}`);
+
+                // ✅ Get updated flight for socket event
+                const updatedFlight = await Flight.findById(flight._id);
+
+                // ✅ EMIT SOCKET EVENT FOR MAIN FLIGHT
+                io.to(`flight-${flight._id}`).emit('flight-cancelled', {
+                    flightId: flight._id.toString(),
+                    availableSeats: updatedFlight.availableSeats,
+                    message: `${booking.passengerCount} seat(s) released. ${updatedFlight.availableSeats} now available.`,
+                });
+
+                console.log(`📡 Emitted flight-cancelled for flight ${flight._id}`);
+                console.log('📣 Payload:', {
+                    flightId: flight._id.toString(),
+                    availableSeats: updatedFlight.availableSeats,
+                });
+
+                // ✅ Restore return flight if round-trip
+                if (booking.tripType === 'round-trip' && returnFlight) {
+                    await Flight.findByIdAndUpdate(returnFlight._id, {
+                        $inc: { availableSeats: booking.passengerCount },
+                    });
+
+                    console.log(`✈️ Restored ${booking.passengerCount} seats for return flight ${returnFlight._id}`);
+
+                    // ✅ Get updated return flight
+                    const updatedReturnFlight = await Flight.findById(returnFlight._id);
+
+                    // ✅ EMIT SOCKET EVENT FOR RETURN FLIGHT
+                    io.to(`flight-${returnFlight._id}`).emit('flight-cancelled', {
+                        flightId: returnFlight._id.toString(),
+                        availableSeats: updatedReturnFlight.availableSeats,
+                        message: `${booking.passengerCount} seat(s) released (return). ${updatedReturnFlight.availableSeats} now available.`,
+                    });
+
+                    console.log(`📡 Emitted flight-cancelled for return flight ${returnFlight._id}`);
+                    console.log('📣 Payload:', {
+                        flightId: returnFlight._id.toString(),
+                        availableSeats: updatedReturnFlight.availableSeats,
+                    });
+                }
+            }
+        }
+
         booking.bookingStatus = 'cancelled';
 
         if (booking.paymentStatus === 'paid') {
@@ -271,7 +359,7 @@ exports.cancelBookings = async (req, res) => {
         }
         await booking.save();
 
-        
+
         res.json({ message: 'Booking cancelled successfully', booking });
     }
     catch (err) {

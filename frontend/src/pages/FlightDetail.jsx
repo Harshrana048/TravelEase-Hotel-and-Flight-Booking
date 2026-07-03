@@ -1,8 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { getFlightById } from "../redux/slices/flightSlice";
+import {
+  initSocket,
+  joinFlight,
+  leaveFlight,
+  onFlightBooked,
+  onFlightCancelled,
+  offFlightBooked,
+} from "../services/socket";
 
 const calculateDuration = (departure, arrival) => {
   const diff = new Date(arrival) - new Date(departure);
@@ -75,10 +83,48 @@ function FlightDetail() {
     (state) => state.flights,
   );
   const { token, user } = useSelector((state) => state.auth);
+  const [availableSeats, setAvailableSeats] = useState(0);
 
   useEffect(() => {
     dispatch(getFlightById(id));
   }, [id, dispatch]);
+
+   // ✅ Socket setup
+  useEffect(() => {
+    const socket = initSocket();
+
+    if (currentFlight?._id) {
+      joinFlight(currentFlight._id);
+
+      // Listen for flight bookings
+      onFlightBooked((data) => {
+        console.log('✈️ Flight booked event:', data);
+        setAvailableSeats(data.availableSeats);
+        toast.success(data.message);
+      });
+
+      // Listen for flight cancellations
+      onFlightCancelled((data) => {
+        console.log('✈️ Flight cancelled event:', data);
+        setAvailableSeats(data.availableSeats);
+        toast.info(data.message);
+      });
+    }
+
+    return () => {
+      if (currentFlight?._id) {
+        leaveFlight(currentFlight._id);
+        offFlightBooked();
+      }
+    };
+  }, [currentFlight?._id]);
+
+  // Update local state when flight loads
+  useEffect(() => {
+    if (currentFlight?.availableSeats !== undefined) {
+      setAvailableSeats(currentFlight.availableSeats);
+    }
+  }, [currentFlight?.availableSeats]);
 
   useEffect(() => {
     if (error) {
@@ -130,25 +176,25 @@ function FlightDetail() {
       <div className="container py-6 md:py-15">
         {/* Back Link */}
         <Link
-      to="/flights"
-      className="group inline-flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-gray-900 transition-colors mb-6"
-    >
-      {/* Fixed sizing container - removed py-10 px-25 */}
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-gray-100 text-gray-600 transition-transform group-hover:-translate-x-0.5">
-        <svg 
-          viewBox="0 0 20 20" 
-          className="h-4 w-4 stroke-current" 
-          fill="currentColor"
+          to="/flights"
+          className="group inline-flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-gray-900 transition-colors mb-6"
         >
-          <path
-            fillRule="evenodd"
-            d="M12.7 15.7a1 1 0 01-1.4 0l-5-5a1 1 0 010-1.4l5-5a1 1 0 111.4 1.4L8.42 10l4.3 4.3a1 1 0 010 1.4z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </span>
-      <span>Back to Flights</span>
-    </Link>
+          {/* Fixed sizing container - removed py-10 px-25 */}
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-gray-100 text-gray-600 transition-transform group-hover:-translate-x-0.5">
+            <svg
+              viewBox="0 0 20 20"
+              className="h-4 w-4 stroke-current"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M12.7 15.7a1 1 0 01-1.4 0l-5-5a1 1 0 010-1.4l5-5a1 1 0 111.4 1.4L8.42 10l4.3 4.3a1 1 0 010 1.4z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </span>
+          <span>Back to Flights</span>
+        </Link>
 
         <div className="mb-2 px-25 ">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
@@ -268,11 +314,11 @@ function FlightDetail() {
                   <span className="text-gray-500 text-sm">Available Seats</span>
                   <span
                     className={`font-semibold ${
-                      flight.availableSeats > 0 ? "text-success" : "text-danger"
+                      availableSeats > 0 ? "text-success" : "text-danger"
                     }`}
                   >
-                    {flight.availableSeats > 0
-                      ? `${flight.availableSeats} seats`
+                    {availableSeats > 0
+                      ? `${availableSeats} seats`
                       : "No seats available"}
                   </span>
                 </div>
@@ -405,17 +451,16 @@ function FlightDetail() {
                 </p>
               </div>
 
-           
               {/* Availability Status Section */}
               <div className="mb-5 pb-5 border-b border-gray-100">
-                {flight.availableSeats > 0 ? (
+                {availableSeats > 0 ? (
                   <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/40 px-3.5 py-1.5 text-xs font-bold shadow-sm shadow-emerald-600/5">
                     {/* Animated status dot element */}
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span>{flight.availableSeats} Seats Available</span>
+                    <span>{availableSeats} Seats Available</span>
                   </div>
                 ) : (
                   <div className="inline-flex items-center gap-2 rounded-xl bg-rose-50 text-rose-700 border border-rose-200/40 px-3.5 py-1.5 text-xs font-bold shadow-sm shadow-rose-600/5">
@@ -452,15 +497,13 @@ function FlightDetail() {
                 <Link
                   to={`/book-flight/${id}`}
                   className={`inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/10 transition-all duration-200 hover:bg-blue-700 active:scale-[0.99] ${
-                    flight.availableSeats > 0
+                    availableSeats > 0
                       ? "bg-primary text-black hover:bg-blue-700 hover:shadow-lg active:scale-[0.98]"
                       : "bg-gray-200 text-gray-500 cursor-not-allowed"
                   }`}
                 >
-                  {flight.availableSeats > 0
-                    ? "Continue to Book"
-                    : "Unavailable"}
-                  {flight.availableSeats > 0 && (
+                  {availableSeats > 0 ? "Continue to Book" : "Unavailable"}
+                  {availableSeats > 0 && (
                     <svg
                       viewBox="0 0 20 20"
                       className="h-4 w-4"
