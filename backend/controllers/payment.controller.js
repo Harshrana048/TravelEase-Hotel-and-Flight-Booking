@@ -380,6 +380,14 @@ exports.verifyPayment = async (req, res) => {
         console.error('⚠️ Background Email Failed:', emailErr.message);
       }
     })();
+
+    // Send success response back to the client
+    res.json({
+      success: true,
+      message: 'Payment verified successfully',
+      paymentId: payment._id,
+    });
+
   } catch (err) {
     console.error('❌ Verification Error:', err.message);
     res.status(500).json({ message: err.message });
