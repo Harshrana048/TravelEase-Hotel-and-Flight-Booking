@@ -113,10 +113,12 @@ export default function BookFlight() {
     setShowReview(true);
   };
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   /* ── Original handleSubmit logic, now called from review modal ── */
  const handleProceedToPayment = async () => {
- 
-   
+    if (isProcessing) return;
+    setIsProcessing(true);
 
   try {
     // 1. Initiate a Pending Reference Booking (Locks the seat on the backend)
@@ -169,11 +171,20 @@ export default function BookFlight() {
               navigate("/payment-success", { 
                 state: { bookingId: result._id, bookingType: "FlightBooking" } // FIX: Was mistakenly "HotelBooking"
               });
+              setIsProcessing(false);
             }, 1000);
           } catch (err) {
             const errorMsg = typeof err === "string" ? err : err?.message || "Payment verification failed";
             toast.error(errorMsg);
-            setTimeout(() => { navigate("/payment-failure", { state: { error: errorMsg } }); }, 1000);
+            setTimeout(() => { 
+              navigate("/payment-failure", { state: { error: errorMsg } }); 
+              setIsProcessing(false);
+            }, 1000);
+          }
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
           }
         },
         prefill: { 
@@ -184,12 +195,15 @@ export default function BookFlight() {
       };
       
       const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', function (response){
+          setIsProcessing(false);
+      });
       razorpay.open();
     };
   } catch (err) {
     const errorMsg = typeof err === "string" ? err : err?.message || "Failed to initiate booking";
     toast.error(errorMsg);
-     isProcessing.current = false; 
+    setIsProcessing(false); 
   }
 };
 
@@ -633,7 +647,7 @@ export default function BookFlight() {
           totalPrice={totalPrice}
           onBack={() => setShowReview(false)}
           onConfirm={handleProceedToPayment}
-          loading={bookingLoading}
+          loading={bookingLoading || isProcessing}
         />
       )}
     </>

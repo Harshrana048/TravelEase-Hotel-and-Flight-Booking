@@ -147,8 +147,11 @@ export default function BookHotel() {
     setShowReview(true);
   };
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isProcessing) return;
 
     // Validation
     if (!formData.checkInDate || !formData.checkOutDate) {
@@ -170,6 +173,8 @@ export default function BookHotel() {
       toast.error("Please enter contact phone");
       return;
     }
+
+    setIsProcessing(true);
 
     try {
       const result = await dispatch(
@@ -228,6 +233,7 @@ export default function BookHotel() {
                 navigate("/payment-success", {
                   state: { bookingId: result._id, bookingType: "HotelBooking" },
                 });
+                setIsProcessing(false);
               }, 1000);
             } catch (err) {
               console.error("❌ Error:", err);
@@ -242,7 +248,13 @@ export default function BookHotel() {
                 navigate("/payment-failure", {
                   state: { error: errorMsg },
                 });
+                setIsProcessing(false);
               }, 1000);
+            }
+          },
+          modal: {
+            ondismiss: function() {
+              setIsProcessing(false);
             }
           },
           prefill: {
@@ -255,6 +267,9 @@ export default function BookHotel() {
         };
 
         const razorpay = new window.Razorpay(options);
+        razorpay.on('payment.failed', function (response){
+            setIsProcessing(false);
+        });
         razorpay.open();
       };
     } catch (err) {
@@ -262,6 +277,7 @@ export default function BookHotel() {
       const errorMsg =
         typeof err === "string" ? err : err?.message || "Failed to book hotel";
       toast.error(errorMsg);
+      setIsProcessing(false);
     }
   };
 
@@ -679,7 +695,7 @@ export default function BookHotel() {
         specialRequests={specialRequests}
         agreedToTerms={agreedToTerms}
         onAgreedToTermsChange={setAgreedToTerms}
-        submitting={bookingLoading}
+        submitting={bookingLoading || isProcessing}
       />
     </div>
   );

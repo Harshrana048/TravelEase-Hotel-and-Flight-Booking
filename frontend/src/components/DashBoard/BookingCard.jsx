@@ -93,6 +93,7 @@ export default function BookingCard({
     : booking.seatNumbers || "Pending";
 
   const handleCompletePayment = async () => {
+    if (paying) return;
     setPaying(true);
     try {
       const paymentResult = await dispatch(
