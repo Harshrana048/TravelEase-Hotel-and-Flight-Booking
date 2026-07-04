@@ -72,7 +72,7 @@ export default function ProfileCard({ compact = false }) {
             <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-600">
               Profile
             </p>
-            <h2 className="mt-0.5 break-words text-xl font-black text-slate-950 leading-tight">
+            <h2 className="mt-0.5 wrap-break-word text-xl font-black text-slate-950 leading-tight">
               {user?.name || "Traveler"}
             </h2>
             <p className="mt-0.5 truncate text-xs text-slate-500">
@@ -123,7 +123,7 @@ export default function ProfileCard({ compact = false }) {
               <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
                 {label}
               </p>
-              <p className="mt-1 break-words text-sm font-bold text-slate-800">
+              <p className="mt-1 wrap-break-word text-sm font-bold text-slate-800">
                 {value}
               </p>
             </div>
