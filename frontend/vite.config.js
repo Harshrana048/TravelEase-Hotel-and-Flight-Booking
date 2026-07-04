@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   plugins: [react(),
-    tailwindcss(),svgr(),
+    tailwindcss(),
 
 
   ],
