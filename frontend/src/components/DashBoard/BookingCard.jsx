@@ -203,6 +203,7 @@ export default function BookingCard({
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 sm:justify-end">
+                
                 <PaymentStatusBadge
                   status={booking.bookingStatus}
                   label={prettyStatus(booking.bookingStatus)}

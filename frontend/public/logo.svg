@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%" height="100%">
+  <defs>
+    <!-- Premium Gradient Matching Your Slate/Blue Theme -->
+    <linearGradient id="travelEaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#4F46E5" />
+    </linearGradient>
+    
+    <!-- Smooth Glow Shadow for the Icon Iconography -->
+    <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#2563EB" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Logo Mark (Icon) -->
+  <g filter="url(#logoGlow)">
+    <!-- Smooth Dynamic Outer Ring -->
+    <path d="M 60,20 A 40,40 0 1,1 25,75" fill="none" stroke="url(#travelEaseGrad)" stroke-width="6" stroke-linecap="round" />
+    
+    <!-- Premium Geometric Background Shield -->
+    <rect x="30" y="30" width="60" height="60" rx="20" fill="url(#travelEaseGrad)" />
+    
+    <!-- Sleek Minimalist Airplane Silhouette Taking Off -->
+    <path d="M 52,68 L 72,44 L 64,44 L 50,56 L 44,52 L 42,55 L 48,60 L 46,66 L 49,66 L 55,60 L 65,60 Z" fill="#FFFFFF" />
+    
+    <!-- Abstract Elegant Destination/Location Dot -->
+    <circle cx="78" cy="38" r="4" fill="#10B981" />
+  </g>
+
+  <!-- Typography Layout -->
+  <!-- "Travel" Text in Bold, Sleek Slate/White Accent Theme -->
+  <text x="115" y="72" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="900" fill="#0F172A" letter-spacing="-0.03em">Travel</text>
+  
+  <!-- "Ease" Text in Modern Luxury Indigo Highlight -->
+  <text x="242" y="72" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="500" fill="url(#travelEaseGrad)" letter-spacing="-0.03em">Ease</text>
+  
+  <!-- App Premium Subtitle Segment -->
+  <text x="118" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#94A3B8" letter-spacing="0.35em">EFFORTLESS LUXURY</text>
+</svg>

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/slices/authSlices";
 import { useEffect } from "react";
 
+
 function Navbar() {
   const { user, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -57,14 +58,39 @@ function Navbar() {
         }`}
       >
         <div className="flex items-center justify-between gap-4">
-          {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-xl font-bold tracking-tight text-blue-600 hover:text-blue-700 transition-colors duration-200"
-          >
-            <span className="text-2xl">✈</span>
-            <span>TravelEase</span>
-          </Link>
+          
+        
+  <Link
+    to="/"
+    className="flex items-center gap-2.5 text-xl font-black tracking-tight text-slate-900 transition-colors duration-200"
+  >
+    {/* Clean Inline SVG Logo Mark */}
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 100 100" 
+      className="h-8 w-8 shrink-0 transition-transform duration-300 hover:scale-105"
+    >
+      <defs>
+        <linearGradient id="navLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#2563EB" />
+          <stop offset="100%" stopColor="#4F46E5" />
+        </linearGradient>
+      </defs>
+      {/* Background Shield */}
+      <rect x="5" y="5" width="90" height="90" rx="26" fill="url(#navLogoGrad)" />
+      {/* Minimalist Airplane Silhouette */}
+      <path d="M 42,68 L 68,36 L 58,36 L 40,52 L 32,47 L 29,51 L 37,58 L 34,66 L 38,66 L 46,58 L 59,58 Z" fill="#FFFFFF" />
+      {/* Destination Dot */}
+      <circle cx="76" cy="28" r="6" fill="#10B981" />
+    </svg>
+
+    {/* Brand Typography */}
+    <span className="flex items-center">
+      <span>Travel</span>
+      <span className="text-blue-600 font-medium">Ease</span>
+    </span>
+  </Link>
+
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
