@@ -106,7 +106,7 @@ const hotelSlice = createSlice({
             state.pages = action.payload.pages;
             state.currentPage = action.payload.currentPage;
         })
-        .addCase(getHotels.rejected,(state) => {
+        .addCase(getHotels.rejected,(state,action) => {
             state.loading = false;
             state.error = action.payload;
         })
