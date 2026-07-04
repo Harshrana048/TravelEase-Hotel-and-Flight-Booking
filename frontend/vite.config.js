@@ -7,7 +7,7 @@ export default defineConfig({
   server:{
     proxy: {
       '/api': {
-        target:'https://travelease-hotel-and-flight-booking-1.onrender.com/',
+        target:'https://travelease-hotel-and-flight-booking-1.onrender.com',
       },
     },
   },
