@@ -214,7 +214,7 @@ function FlightDetail() {
           <span>Back to Flights</span>
         </Link>
 
-        <div className="mb-2 px-25 ">
+        <div className="mb-2 px-4 sm:px-8 lg:px-25">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
             Flight Details
           </h1>
@@ -223,7 +223,7 @@ function FlightDetail() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8 px-25 ">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8 px-4 sm:px-8 lg:px-25">
           {/* ---------- Main Content ---------- */}
           <div className="lg:col-span-2 space-y-8">
             {/* Flight Header + Timeline */}

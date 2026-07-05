@@ -392,7 +392,7 @@ export default function HotelDetail() {
           </div>
 
           {/* RIGHT: sticky booking sidebar — moved out of the gallery, lives here now */}
-          <aside className="sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain space-y-5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+          <aside className="lg:sticky lg:top-24 self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto overscroll-contain space-y-5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
             <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_20px_50px_-20px_rgba(15,23,42,0.08)]">
               {/* Price & Rating */}
               <div className="flex items-end justify-between gap-4 pb-5 border-b border-gray-100">

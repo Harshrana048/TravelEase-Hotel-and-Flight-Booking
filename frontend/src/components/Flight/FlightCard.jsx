@@ -93,7 +93,7 @@ function FlightCard({ flight }) {
           <span className="ml-1 text-xs font-normal text-slate-400">/ person</span>
         </p>
         <p className="text-xs text-slate-500">{flight.availableSeats ?? 0} seats left</p>
-        <span className="mt-1 inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition group-hover:bg-sky-700">
+        <span className="mt-1 w-full lg:w-auto inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition group-hover:bg-sky-700">
           Select
         </span>
       </div>

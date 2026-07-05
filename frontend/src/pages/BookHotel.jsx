@@ -318,7 +318,7 @@ export default function BookHotel() {
           </span>
           Back to Hotel
         </Link>
-      <div className="px-20">
+      <div className="px-4 sm:px-8 lg:px-20">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
           Complete Your Booking
         </h1>
@@ -327,7 +327,7 @@ export default function BookHotel() {
         </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8 px-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8 px-4 sm:px-8 lg:px-20">
           {/* ---------- Left column ---------- */}
           <div className="lg:col-span-2 space-y-6">
             {/* Guest Details */}

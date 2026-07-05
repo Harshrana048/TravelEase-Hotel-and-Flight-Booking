@@ -73,7 +73,7 @@ function HotelCard({ hotel }) {
                 : "Sold Out"}
             </p>
           </div>
-          <span className="inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition duration-200 group-hover:bg-sky-700">
+          <span className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition duration-200 group-hover:bg-sky-700">
             View Details
           </span>
         </div>

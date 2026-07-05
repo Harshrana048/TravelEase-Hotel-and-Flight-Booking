@@ -60,7 +60,7 @@ function Flight() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-20 py-20 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-slate-50 px-4 py-20 sm:px-6 lg:px-10">
       <div className="mx-auto w-full max-w-5xl">
         <div className="mb-8 rounded-4xl bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">

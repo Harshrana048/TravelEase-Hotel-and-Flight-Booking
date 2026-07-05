@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -230,7 +230,7 @@ export default function Home() {
                 </label>
                 <button
                   type="submit"
-                  className="self-end rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 hover:shadow-xl active:scale-95"
+                  className="self-end w-full sm:w-auto rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 hover:shadow-xl active:scale-95"
                 >
                   Search
                 </button>
@@ -279,7 +279,7 @@ export default function Home() {
                 </label>
                 <button
                   type="submit"
-                  className="self-end rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 hover:shadow-xl active:scale-95"
+                  className="self-end w-full sm:w-auto rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 hover:shadow-xl active:scale-95"
                 >
                   Search
                 </button>
@@ -472,16 +472,16 @@ export default function Home() {
             Thousands of hotels and flights are waiting. Start your search and
             book in minutes.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/hotels"
-              className="rounded-xl bg-white px-8 py-3 text-sm font-semibold text-slate-900 shadow transition hover:bg-slate-100 active:scale-95"
+              className="w-full sm:w-auto rounded-xl bg-white px-8 py-3 text-sm font-semibold text-slate-900 shadow transition hover:bg-slate-100 active:scale-95"
             >
               Browse Hotels
             </Link>
             <Link
               to="/flights"
-              className="rounded-xl border border-white/20 bg-white/10 px-8 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 active:scale-95"
+              className="w-full sm:w-auto rounded-xl border border-white/20 bg-white/10 px-8 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 active:scale-95"
             >
               Find Flights
             </Link>
