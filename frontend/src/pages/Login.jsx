@@ -245,11 +245,10 @@ export default function Login() {
     </svg>
     Continue with Google
   </button>
-  <div className="absolute inset-0 flex items-center justify-center opacity-0">
+  <div className="absolute inset-0 flex items-center justify-center opacity-0 overflow-hidden">
     <GoogleLogin
       onSuccess={handleGoogleSuccess}
       onError={() => toast.error("Google sign-in failed")}
-      width="100%"
     />
   </div>
 </div>
