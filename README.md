@@ -4,8 +4,9 @@ A complete full-stack booking platform for hotels and flights with real-time ava
 
 ## 🌐 Live Demo
 
-**Frontend:** https://travelease.vercel.app  
-**Backend API:** https://travelease-backend.onrender.com
+**Frontend:** https://travel-ease-hotel-and-flight-bookin-xi.vercel.app/
+
+**Backend API:** https://travelease-hotel-and-flight-booking.onrender.com
 
 ---
 
@@ -74,7 +75,7 @@ A complete full-stack booking platform for hotels and flights with real-time ava
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/travelease.git
+git clone https://github.com/Harshrana048/travelease.git
 cd travelease/backend
 
 # Install dependencies
@@ -122,7 +123,7 @@ npm install
 
 # Create .env file
 cat > .env << EOF
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:3000/api
 EOF
 
 # Start development server
@@ -338,10 +339,7 @@ Uses OpenAI to extract filters from natural language queries, then searches Mong
 - `POST /api/ai/search-hotels` - Natural language hotel search
 - `POST /api/ai/search-flights` - Natural language flight search
 
-### Wishlist
-- `GET /api/wishlist` - Get wishlist
-- `POST /api/wishlist/add` - Add to wishlist
-- `DELETE /api/wishlist/remove/:id` - Remove from wishlist
+
 
 ---
 
@@ -510,4 +508,4 @@ This project is open source and available under the MIT License.
 
 ---
 
-**Happy Booking! 🎉**
+
