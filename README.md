@@ -416,7 +416,7 @@ EMAIL_USER=your_email@gmail.com
 EMAIL_PASSWORD=app_password
 RAZORPAY_KEY_ID=key_xxx
 RAZORPAY_KEY_SECRET=secret_xxx
-OPENAI_API_KEY=sk-xxx
+GEMINI_API_KEY=sk-xxx
 NODE_ENV=development
 ```
 
@@ -472,11 +472,11 @@ This project is open source and available under the MIT License.
 
 ## 👨‍💻 Author
 
-**Your Name**
+**HARSH RANA**
 
-- GitHub: https://github.com/yourusername
-- LinkedIn: https://linkedin.com/in/yourprofile
-- Email: your.email@example.com
+- GitHub: https://github.com/Harshrana048
+- LinkedIn: https://www.linkedin.com/in/harshrana0408/
+- Email: harsh29011@gmail.com
 
 ---
 
