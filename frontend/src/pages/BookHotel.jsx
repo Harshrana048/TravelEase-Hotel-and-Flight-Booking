@@ -213,7 +213,7 @@ export default function BookHotel() {
           order_id: paymentResult.orderId,
           handler: async (response) => {
             try {
-              console.log("🎉 Razorpay Success:", response);
+              
 
               const verifyResult = await dispatch(
                 verifyPayment({
@@ -225,7 +225,7 @@ export default function BookHotel() {
                 }),
               ).unwrap();
 
-              console.log("✅ Verification complete:", verifyResult);
+              
 
               toast.success("Payment verified! Redirecting...");
 

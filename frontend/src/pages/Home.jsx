@@ -10,6 +10,7 @@ import {
   setFilters as setFlightFilters,
   setPage as setFlightPage,
 } from "../redux/slices/flightSlice";
+import { AISearchBox } from "../components";
 
 const FEATURE_CARDS = [
   {
@@ -487,6 +488,7 @@ export default function Home() {
             </Link>
           </div>
         </div>
+        <AISearchBox />
       </section>
     </main>
   );

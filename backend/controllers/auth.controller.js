@@ -26,14 +26,28 @@ exports.googleLogin = async (req, res) => {
     if (!credential)
       return res.status(400).json({ message: 'Google credential missing' });
 
-    // Verify the ID token with Google
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    let payload;
 
-    const {email,name,sub} = ticket.getPayload();
-    
+    // Check if credential is a JWT (ID Token) or an Access Token
+    if (credential.split('.').length === 3) {
+      // Verify the ID token with Google
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } else {
+      // Verify Access Token with Google UserInfo endpoint
+      const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${credential}` }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to verify access token with Google');
+      }
+      payload = await response.json();
+    }
+
+    const { email, name, sub } = payload;
 
     // Check if user already exists
     let user = await User.findOne({ email });

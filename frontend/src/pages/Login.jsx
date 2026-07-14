@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -39,16 +39,19 @@ export default function Login() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      console.log("🎉 Google Auth Token received");
-      await dispatch(googleLogin(credentialResponse.credential)).unwrap();
-      toast.success("Logged in with Google successfully");
-      navigate("/");
-    } catch (error) {
-      toast.error(error || "Failed to authenticate with Google");
-    }
-  };
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+       
+        await dispatch(googleLogin(tokenResponse.access_token)).unwrap();
+        toast.success("Logged in with Google successfully");
+        navigate("/");
+      } catch (error) {
+        toast.error(error || "Failed to authenticate with Google");
+      }
+    },
+    onError: () => toast.error("Google sign-in failed"),
+  });
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950">
       <style>{`
@@ -230,28 +233,19 @@ export default function Login() {
   <span className="h-px flex-1 bg-slate-200" />
 </div>
 
-{/* 🔑 FIXED: Clean, beautifully interactive button element layout! */}
-<div className="relative w-full overflow-hidden rounded-2xl">
-  <button
-    type="button"
-    tabIndex={-1}
-    className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md cursor-pointer"
-  >
-    <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
-      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
-      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/>
-      <path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.2-5.1l-6.6-5.4C29.6 35.4 26.9 36 24 36c-5.2 0-9.6-3.3-11.2-7.9l-6.6 5.1C9.5 39.6 16.2 44 24 44z"/>
-      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.5l6.6 5.4C41.4 35.6 44 30.2 44 24c0-1.3-.1-2.7-.4-3.5z"/>
-    </svg>
-    Continue with Google
-  </button>
-  <div className="absolute inset-0 flex items-center justify-center opacity-0 overflow-hidden">
-    <GoogleLogin
-      onSuccess={handleGoogleSuccess}
-      onError={() => toast.error("Google sign-in failed")}
-    />
-  </div>
-</div>
+<button
+  type="button"
+  onClick={() => loginWithGoogle()}
+  className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md cursor-pointer"
+>
+  <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
+    <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
+    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/>
+    <path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.2-5.1l-6.6-5.4C29.6 35.4 26.9 36 24 36c-5.2 0-9.6-3.3-11.2-7.9l-6.6 5.1C9.5 39.6 16.2 44 24 44z"/>
+    <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.5l6.6 5.4C41.4 35.6 44 30.2 44 24c0-1.3-.1-2.7-.4-3.5z"/>
+  </svg>
+  Continue with Google
+</button>
               </div>
             </section>
           </div>

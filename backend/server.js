@@ -14,8 +14,10 @@ const flightRoutes = require('./routes/flight.routes');
 const bookingRoutes = require('./routes/booking.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const { notFound } = require('./middleware/404Notfound');
-const wishlistRoutes = require('./routes/wishlist.routes')
-const adminRoutes = require('./routes/admin.routes')
+const wishlistRoutes = require('./routes/wishlist.routes');
+const adminRoutes = require('./routes/admin.routes');
+const aiRoutes = require('./routes/ai.routes');
+
 
 const app = express();
 app.use(cors());
@@ -79,6 +81,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ai',aiRoutes)
 
 
 // error
