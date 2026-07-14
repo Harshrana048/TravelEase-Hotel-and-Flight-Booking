@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { Navbar, Footer, ProtectedRoute,NotFound} from "./components/index";
+import { Navbar, Footer, ProtectedRoute, NotFound, FloatingAIAssistant } from "./components/index";
 import {
   Home,
   Login,
@@ -108,6 +108,7 @@ function AppContent() {
       </main>
 
       {showShell && <Footer />}
+      {showShell && <FloatingAIAssistant />}
     </div>
   );
 }

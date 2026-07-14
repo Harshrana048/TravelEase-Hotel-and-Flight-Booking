@@ -17,7 +17,7 @@ export const searchHotelsWithAI = async (query) => {
 export const searchFlightsWithAI = async (query) => {
   try {
     console.log('🤖 [Frontend AI] Searching flights:', query);
-    const { data } = await api.post('/api/ai/search-flights', { query });
+    const { data } = await api.post('/ai/search-flights', { query });
     console.log('✅ [Frontend AI] Results:', data);
     return data;
   } catch (err) {

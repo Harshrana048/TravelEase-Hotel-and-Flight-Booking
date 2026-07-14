@@ -99,7 +99,7 @@ export default function CancelBookingModal({ booking, bookingType, onClose }) {
               type="button"
               onClick={handleCancel}
               disabled={cancelling}
-              className="flex-1 rounded-xl bg-danger py-3 font-bold text-white hover:bg-red-700 hover:shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:shadow-none"
+              className="flex-1 rounded-xl bg-red-400 py-3 font-bold text-black hover:bg-red-700 hover:shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:shadow-none"
             >
               {cancelling ? "Cancelling..." : "Yes, Cancel & Refund"}
             </button>

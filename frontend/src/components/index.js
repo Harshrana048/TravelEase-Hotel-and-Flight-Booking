@@ -26,12 +26,12 @@ import EmptyState from "./Admin/EmptyState";
 import LoadingSkeleton from "./Admin/LoadingSkeleton";
 import ConfirmModal from "./Admin/ConfirmModal";
 import NotFound from "../pages/NotFound";
-import AISearchBox from "./Navbar/AiSearchBox";
+import FloatingAIAssistant from "./Navbar/FloatingAIAssistant";
 
 export {
   Navbar, Footer, ProtectedRoute, HotelCard, HotelFilters, ReviewForm, FlightCard,
   ProfileSection, BookingCard, MyBookings, WishlistSection,
   AdminStats, BookingManagement, FlightManagement, UserManagement, HotelManagement,
-  ReviewModal, HotelReviewBookingModal,NotFound,AISearchBox,
+  ReviewModal, HotelReviewBookingModal,NotFound, FloatingAIAssistant,
   AdminLayout, AdminSidebar, AdminHeader, StatCard, EmptyState, LoadingSkeleton, ConfirmModal,
 };

@@ -9,32 +9,36 @@ exports.extractHotelFilters = async (userInput) => {
     try {
         console.log('🤖 [AI Service] Processing hotel search:', userInput);
 
-        const prompt = `You are a travel booking assistant. Extract hotel search filters from user input.
+        const prompt = `You are a travel booking assistant. Extract hotel search intent from user input.
 
-Return ONLY valid JSON, nothing else.
+Return ONLY valid JSON, nothing else. Do not use markdown wrapping like \`\`\`.
 
 Fields to extract (use null if not mentioned):
 {
   "city": "destination city or null",
-  "checkInDate": "YYYY-MM-DD or null",
-  "checkOutDate": "YYYY-MM-DD or null",
+  "hotelCategory": "Luxury, Premium, Budget, Economy, or null",
+  "hotelType": "Family, Business, Romantic, Couple, Backpacker, Resort, Hostel, Villa, Apartment, or null",
+  "locationPreference": "Beach, Mountain, Adventure, Airport, City Center, Train Station, Waterfront, Near Metro, or null",
   "maxBudget": number or null,
-  "amenities": ["array", "of", "amenities"] or null,
-  "minRating": 1-5 or null,
   "roomsNeeded": number or null,
-  "guests": number or null
+  "guests": number or null,
+  "checkInDate": "YYYY-MM-DD or null",
+  "checkOutDate": "YYYY-MM-DD or null"
 }
 
 Examples:
-1. Input: "I want beaches in Goa for Dec 15-20, budget 50000"
-   Output: {"city":"Goa","checkInDate":"2024-12-15","checkOutDate":"2024-12-20","maxBudget":50000,"amenities":["beaches"],"minRating":null,"roomsNeeded":null,"guests":null}
+1. Input: "Luxury hotel in Mumbai"
+   Output: {"city":"Mumbai","hotelCategory":"Luxury","hotelType":null,"locationPreference":null,"maxBudget":null,"roomsNeeded":null,"guests":null,"checkInDate":null,"checkOutDate":null}
 
-2. Input: "5-star hotel in Mumbai with WiFi and pool, max 10000"
-   Output: {"city":"Mumbai","checkInDate":null,"checkOutDate":null,"maxBudget":10000,"amenities":["WiFi","pool"],"minRating":5,"roomsNeeded":null,"guests":null}
+2. Input: "Cheap beach resorts in Goa under 5000"
+   Output: {"city":"Goa","hotelCategory":"Budget","hotelType":"Resort","locationPreference":"Beach","maxBudget":5000,"roomsNeeded":null,"guests":null,"checkInDate":null,"checkOutDate":null}
+
+3. Input: "Family hotel near airport"
+   Output: {"city":null,"hotelCategory":null,"hotelType":"Family","locationPreference":"Airport","maxBudget":null,"roomsNeeded":null,"guests":null,"checkInDate":null,"checkOutDate":null}
 
 User input: "${userInput}"
 
-IMPORTANT: Return only the JSON object, no explanations!`;
+IMPORTANT: Return only the JSON object, no explanations! No markdown code blocks!`;
 
         // Updated invocation to new SDK format
         const response = await ai.models.generateContent({
@@ -61,35 +65,42 @@ exports.extractFlightFilters = async (userInput) => {
   try {
     console.log('🤖 [AI Service] Processing flight search:', userInput);
 
-    const prompt = `You are a flight booking assistant. Extract flight search filters from user input.
+    const prompt = `You are a flight booking assistant. Extract flight search intent from user input.
 
-Return ONLY valid JSON, nothing else.
+Return ONLY valid JSON, nothing else. Do not use markdown wrapping like \`\`\`.
 
 Fields to extract (use null if not mentioned):
 {
   "source": "departure city or null",
   "destination": "arrival city or null",
-  "departureDate": "YYYY-MM-DD or null",
-  "returnDate": "YYYY-MM-DD or null (for round trip)",
+  "travelStyle": "Luxury, Business, Budget, Vacation, Family, Student, Backpacker or null",
+  "travelClass": "Economy, Business, First or null",
+  "departureTime": "Morning, Afternoon, Evening, Night, Red Eye or null",
+  "stops": 0 or 1 or null (0 for direct/non-stop),
+  "tripType": "Round Trip, One Way or null",
+  "flexibleDates": boolean or null,
   "maxBudget": number or null,
-  "class": "Economy/Business/First or null",
-  "passengers": number or null
+  "departureDate": "YYYY-MM-DD or 'tomorrow' or null",
+  "returnDate": "YYYY-MM-DD or null"
 }
 
 Examples:
-1. Input: "Flights from Mumbai to Goa on Dec 20, budget 3000"
-   Output: {"source":"Mumbai","destination":"Goa","departureDate":"2024-12-20","returnDate":null,"maxBudget":3000,"class":"Economy","passengers":null}
+1. Input: "Cheap flight from Mumbai to Goa"
+   Output: {"source":"Mumbai","destination":"Goa","travelStyle":"Budget","travelClass":"Economy","departureTime":null,"stops":null,"tripType":null,"flexibleDates":null,"maxBudget":null,"departureDate":null,"returnDate":null}
 
-2. Input: "Business class Delhi to London, round trip Dec 15-25"
-   Output: {"source":"Delhi","destination":"London","departureDate":"2024-12-15","returnDate":"2024-12-25","maxBudget":null,"class":"Business","passengers":null}
+2. Input: "Business class Delhi to London"
+   Output: {"source":"Delhi","destination":"London","travelStyle":"Business","travelClass":"Business","departureTime":null,"stops":null,"tripType":null,"flexibleDates":null,"maxBudget":null,"departureDate":null,"returnDate":null}
+
+3. Input: "Direct morning flight to Dubai"
+   Output: {"source":null,"destination":"Dubai","travelStyle":null,"travelClass":null,"departureTime":"Morning","stops":0,"tripType":null,"flexibleDates":null,"maxBudget":null,"departureDate":null,"returnDate":null}
 
 User input: "${userInput}"
 
-IMPORTANT: Return only the JSON object, no explanations!`;
+IMPORTANT: Return only the JSON object, no explanations! No markdown code blocks!`;
 
     // Updated invocation to new SDK format
     const response = await ai.models.generateContent({
-        model: 'gemini-flash-latest',
+        model: 'gemini-3.5-flash',
         contents: prompt,
     });
 
