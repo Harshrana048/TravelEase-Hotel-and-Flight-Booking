@@ -107,6 +107,12 @@ exports.register = async (req, res) => {
         message: 'User with this email already exists',
       });
     }
+    if(password.length < 6){
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long',
+      });
+    }
     // 3. check if phone number is 10 digit and already exists
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {

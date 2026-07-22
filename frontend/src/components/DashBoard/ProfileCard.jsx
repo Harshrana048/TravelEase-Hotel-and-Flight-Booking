@@ -3,12 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { updateProfile, changePassword } from "../../redux/slices/authSlices";
 import { formatDate, getInitials } from "./dashboardHelpers";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function ProfileCard({ compact = false }) {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -185,42 +189,72 @@ export default function ProfileCard({ compact = false }) {
           <div className="flex flex-col gap-4">
             <label className="block">
               <span className="text-xs font-bold text-slate-700">Current Password</span>
-              <input
-                type="password"
-                name="oldPassword"
-                value={passwordData.oldPassword}
-                onChange={(event) =>
-                  setPasswordData({ ...passwordData, currentPassword: event.target.value })
-                }
-                required
-                className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
-              />
+              <div className="relative mt-2">
+                <input
+                  type={showOldPassword ? "text" : "password"}
+                  name="oldPassword"
+                  value={passwordData.oldPassword}
+                  onChange={(event) =>
+                    setPasswordData({ ...passwordData, oldPassword: event.target.value })
+                  }
+                  required
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 pl-4 pr-11 py-3 text-sm outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowOldPassword(!showOldPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  aria-label={showOldPassword ? "Hide password" : "Show password"}
+                >
+                  {showOldPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </label>
             <label className="block">
               <span className="text-xs font-bold text-slate-700">New Password</span>
-              <input
-                type="password"
-                name="newPassword"
-                value={passwordData.newPassword}
-                onChange={(event) =>
-                  setPasswordData({ ...passwordData, newPassword: event.target.value })
-                }
-                required
-                className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
-              />
+              <div className="relative mt-2">
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={(event) =>
+                    setPasswordData({ ...passwordData, newPassword: event.target.value })
+                  }
+                  required
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 pl-4 pr-11 py-3 text-sm outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  aria-label={showNewPassword ? "Hide password" : "Show password"}
+                >
+                  {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </label>
             <label className="block">
               <span className="text-xs font-bold text-slate-700">Confirm New Password</span>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={(event) =>
-                  setPasswordData({ ...passwordData, confirmPassword: event.target.value })
-                }
-                required
-                className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
-              />
+              <div className="relative mt-2">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={(event) =>
+                    setPasswordData({ ...passwordData, confirmPassword: event.target.value })
+                  }
+                  required
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 pl-4 pr-11 py-3 text-sm outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </label>
           </div>
           <button
