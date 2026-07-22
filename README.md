@@ -19,7 +19,6 @@ A complete full-stack booking platform for hotels and flights with real-time ava
 - 💳 **Secure Payments** - Razorpay integration for online payments
 - 📱 **Real-time Updates** - Socket.io for instant availability updates
 - 📅 **Booking Management** - View, cancel, and download booking tickets
-- ❤️ **Wishlist** - Save favorite hotels and flights
 - 📧 **Email Confirmations** - Automated booking confirmations with PDF attachments
 - 🤖 **AI Search** - Natural language hotel search using OpenAI
 
@@ -54,7 +53,7 @@ A complete full-stack booking platform for hotels and flights with real-time ava
 - **Razorpay** - Payment gateway
 - **Nodemailer** - Email service
 - **PDFKit** - PDF generation
-- **OpenAI** - AI-powered search
+- **Gemini-ai** - AI-powered search
 - **CORS** - Cross-origin requests
 
 ### Deployment
@@ -102,14 +101,14 @@ RAZORPAY_KEY_SECRET=your_razorpay_secret
 # Google OAuth
 GOOGLE_CLIENT_ID=your_google_client_id
 
-# OpenAI (for AI search)
-OPENAI_API_KEY=your_openai_api_key
+# Gemini (for AI search)
+GEMINI_API_KEY=your_GEMINI_api_key
 
 NODE_ENV=development
 EOF
 
 # Start development server
-npm run dev
+npm start
 ```
 
 ### Frontend Setup
@@ -279,7 +278,7 @@ When a user books a hotel/flight, all other users viewing that property get inst
 - Automatic refund on booking cancellation
 
 ### AI-Powered Search
-Uses OpenAI to extract filters from natural language queries, then searches MongoDB for actual results. Faster and cheaper than full AI recommendations.
+Uses GEMINI to extract filters from natural language queries, then searches MongoDB for actual results. Faster and cheaper than full AI recommendations.
 
 ### Admin Dashboard
 - Real-time revenue analytics
