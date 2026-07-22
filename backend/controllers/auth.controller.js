@@ -189,7 +189,7 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
+// change password
 exports.changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
